@@ -1,0 +1,14 @@
+---
+title: "BD"
+author: "Aida Fernandez, 1497182"
+fontsize: 11pt
+documentclass: article
+output:
+  html_document:
+    df_print: paged
+    number_sections: false
+  pdf_document: 
+    keep_tex: true
+---
+
+Prova
