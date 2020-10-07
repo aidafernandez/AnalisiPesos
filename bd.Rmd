@@ -11,4 +11,94 @@ output:
     keep_tex: true
 ---
 
-Prova
+Llegim les dades.
+```{r}
+library(readxl)
+pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",
+                      range = "A1:D949")
+```
+
+Comprovem que les dades s'han llegit com voliem.
+```{r}
+View(pesInd)
+names(pesInd)
+dim(pesInd)
+```
+
+????Posem les variables "Box" i "Treat" com a factors.????
+```{r}
+pesInd$Box <- as.factor(pesInd$Box)
+pesInd$Treat <- as.factor(pesInd$Treat)
+
+levels(pesInd$Box)
+levels(pesInd$Treat)
+```
+
+
+### Tractament de les dades faltants
+
+Observem que hi ha dades faltants només en el pes al dia 41.
+```{r}
+apply(pesInd,2,anyNA)
+```
+
+Observem com es distribueixen les dades faltants segons el Tractament.
+```{r}
+naTreat <- aggregate(as.data.frame(is.na(pesInd))$BW41, by=list(pesInd$Treat), FUN=sum)
+colnames(naTreat) <- c("Treat","NombreDeNA")
+naTreat
+```
+
+Observem com es distribueixen les dades faltants segons la Caixa.
+```{r}
+naBox <- aggregate(as.data.frame(is.na(pesInd))$BW41, by=list(pesInd$Box), FUN=sum)
+colnames(naBox) <- c("Box","NombreDeNA")
+```
+
+Mostrem només aquells que contenen dades faltants.
+```{r}
+subset(naBox,naBox$NombreDeNA > 0)
+```
+
+* Test per a veure si la distribució de les dades faltants es pot considerar aleatòria?
+
+
+#### Eliminació de les dades faltants
+Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
+
+```{r}
+pesIndOmitNA <- na.omit(pesInd)
+```
+
+
+#### Substitució per la mitjana o mediana:
+
+Una altra opció seria substituir les dades faltants per la mediana o la mitjana de les dades totals, o bé, del grup corresponent. Hi ha un inconvenient, ja que tot i que la mitjana de les dades o els grups no canviaria, disminuiria la variància.
+
+
+#### Estimació del valor de les dades faltants mitjançant un model lineal múltiple
+
+Serà possible explicar la incertesa.
+
+##### Manera "rudimentaria"
+Obviem la variable Box per tal de simplificar el model lineal.
+```{r}
+lmMod <- lm(BW41 ~ Treat + BW28, data = pesInd)
+summary(lmMod)
+casosNA <- pesInd[!complete.cases(pesInd$BW41),]
+```
+
+*$R^2$ Molt dolent!!!
+
+Creem un duplicat de la base de dades original per a no modificarla.
+```{r}
+pesIndEstNA <- pesInd
+```
+
+Substituim les prediccions del model per les corresponents dades faltants a la base de dades.
+```{r}
+predCasosNA <- predict.lm(lmMod,casosNA[,c("Treat","BW28")])
+pesIndEstNA[!complete.cases(pesInd$BW41),]$BW41 <- predCasosNA
+```
+
+
