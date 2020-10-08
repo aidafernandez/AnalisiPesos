@@ -11,6 +11,7 @@ output:
     keep_tex: true
 ---
 
+## Tractament de les dades
 Llegim les dades.
 ```{r}
 library(readxl)
@@ -60,7 +61,7 @@ Mostrem només aquells que contenen dades faltants.
 subset(naBox,naBox$NombreDeNA > 0)
 ```
 
-* Test per a veure si la distribució de les dades faltants es pot considerar aleatòria?
+*** Test per a veure si la distribució de les dades faltants es pot considerar aleatòria?
 
 
 #### Eliminació de les dades faltants
@@ -88,7 +89,7 @@ summary(lmMod)
 casosNA <- pesInd[!complete.cases(pesInd$BW41),]
 ```
 
-*$R^2$ Molt dolent!!!
+*** $R^2$ Molt dolent!!!
 
 Creem un duplicat de la base de dades original per a no modificarla.
 ```{r}
@@ -101,4 +102,92 @@ predCasosNA <- predict.lm(lmMod,casosNA[,c("Treat","BW28")])
 pesIndEstNA[!complete.cases(pesInd$BW41),]$BW41 <- predCasosNA
 ```
 
+
+##### Package "mice"
+
+```{r}
+# install.packages("mice")
+library(mice)
+```
+
+Es basa en el Multivariate Imputation by Chained Equations, es a dir, Imputació multivariant per equacions encadenades.
+
+La funció _mice()_ crea múltiples imputacions per les dades faltants multivariants. El mètode imputa cada variable incompleta segons un model separat
+
+Primer provem amb el mètode predeterminat, que és el "Predictive Mean Matching" 
+```{r}
+MicePmm <- mice(pesInd)
+summary(MicePmm)
+```
+
+A continuació completem les dades amb _complete()_:
+```{r}
+pesIndMicePmm <- complete(MicePmm)
+```
+
+Observem tots el mètodes d'imputació de la funció _mice()_.
+```{r}
+methods(mice)
+```
+
+## Histogrames comparatius
+Amb les següents llibraries podrem obtenir ggplots d'una manera considerablement senzilla.
+```{r}
+# library(ggplot2)
+# install.packages("devtools")
+library(devtools)
+
+install_github("kassambara/easyGgplot2")
+
+library(easyGgplot2)
+```
+
+*** He intuit que el pes que es vol comparar és el de les 41 setmanes.
+
+Funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
+Els arguments de la funció són:
+
+  * "BD" la base de dades.
+  
+  * "Trac1" i "Tract2" són els tractaments a comparar.
+  
+  * "TipusGraf" si és 1 representem els histogrames solapant-se al mateix eix de les y,
+               si val 2 representarem els histogrames un a sobre de l'altre pero en diferents eix y.
+               
+  * "NombreBins" és el nombre de "caixes" en que estarà dividit l'histograma de cadascún dels tractaments, el valor predeterminat és 10.
+ 
+```{r}
+histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10){
+  t1vst2 <- subset(BD,Treat == c(Tract1,Tract2))
+  
+  if(TipusGraf==1){
+  ggplot2.histogram(data=t1vst2, xName='BW41',
+    groupName='Treat', legendPosition="top",
+    alpha=0.5, addDensity=TRUE, xlim = c(100,4000), bins=NombreBins*2,
+    addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
+  }
+
+  else{
+  ggplot2.histogram(data=t1vst2, xName='BW41',
+         groupName='Treat', legendPosition="top", xlim = c(100,4000), bins=NombreBins*2,
+        faceting=TRUE, facetingVarNames="Treat")
+  }
+}
+
+histComparatius(pesInd,1,8,1,20)
+histComparatius(pesInd,1,8,2,20)
+```
+
+
+Fem els histogrames de tipus 2 de tots els tractaments enfront el tractament de control:
+
+```{r}
+histComparatius(pesInd,1,2,2)
+histComparatius(pesInd,1,3,2)
+histComparatius(pesInd,1,4,2)
+histComparatius(pesInd,1,5,2)
+histComparatius(pesInd,1,6,2)
+histComparatius(pesInd,1,7,2)
+histComparatius(pesInd,1,8,2)
+```
 
