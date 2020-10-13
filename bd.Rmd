@@ -15,8 +15,8 @@ output:
 Llegim les dades.
 ```{r}
 library(readxl)
-pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",
-                      range = "A1:D949")
+#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
 ```
 
 Comprovem que les dades s'han llegit com voliem.
@@ -133,12 +133,10 @@ methods(mice)
 ## Histogrames comparatius
 Amb les següents llibraries podrem obtenir ggplots d'una manera considerablement senzilla.
 ```{r}
-# library(ggplot2)
+library(ggplot2)
 # install.packages("devtools")
 library(devtools)
-
-install_github("kassambara/easyGgplot2")
-
+# devtools::install_github("kassambara/easyGgplot2")
 library(easyGgplot2)
 ```
 
@@ -157,11 +155,11 @@ Els arguments de la funció són:
   * "NombreBins" és el nombre de "caixes" en que estarà dividit l'histograma de cadascún dels tractaments, el valor predeterminat és 10.
  
 ```{r}
-histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10){
+histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,col=4){
   t1vst2 <- subset(BD,Treat == c(Tract1,Tract2))
   
   if(TipusGraf==1){
-  ggplot2.histogram(data=t1vst2, xName='BW41',
+  ggplot2.histogram(data=t1vst2, xName=colnames(BD)[col],
     groupName='Treat', legendPosition="top",
     alpha=0.5, addDensity=TRUE, xlim = c(100,4000), bins=NombreBins*2,
     addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
@@ -191,3 +189,38 @@ histComparatius(pesInd,1,7,2)
 histComparatius(pesInd,1,8,2)
 ```
 
+
+## Funcions del paquet _snpar_
+```{r}
+# install.packages("snpar")
+library(snpar)
+help("snpar")
+library(help = snpar)
+```
+
+Observem que segons la _R Documentation_ del package, aquest ens proporciona Mètodes Estadístics Suplementaris No-Paramètrics. 
+
+https://cran.r-project.org/web/packages/snpar/snpar.pdf
+
+  * Cox-Stuart Trend Test - **cs.test** - Test per a detectar la presència de tendència sense importar la distribució de les dades.
+ 
+  * Kernel Density and Distribution Estimation - **kde** - Computa una estimació no-paramètrica del nucli de la PDF i la CDF.
+
+  * Kernel Regression Estimation - **kre** - Ajusta una relació no paramètrica entre un parell de variables aleatòries mitjançant el mètode del nucli.
+  
+  * Kolmogorov-Smirnov Test - **ks.test** - És una prova no paramètrica que determina la bondat d'ajust de dues distribucions de probabilitat entre si.
+  
+  * Normal Score (Van der Waerden) Test - **ns.test** - Test no paramètric per a testar la hipòtesi que _k_ funcions de distribució mostrals són iguals.
+  
+  * Quantile Test - **quant.test** - Realitza una prova de quantils d'una mostra i d'igualtat de quantils de dues mostres.
+  
+  * Runs Test for Randomness - **runs.test** - Realitza un test per a l'aleatorietat d'una seqüència numèrica.
+
+
+
+
+```{r}
+plot(pesInd$BW28, pesInd$BW41)
+```
+
+Calcular l'error típic de la predicció que depèn de cada dada faltant i generar una normal centrada en el punt de la recta i amb desviació l'error típic.
