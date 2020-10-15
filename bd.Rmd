@@ -114,7 +114,7 @@ library(mice)
 
 Es basa en el Multivariate Imputation by Chained Equations, es a dir, Imputació multivariant per equacions encadenades.
 
-La funció _mice()_ crea múltiples imputacions per les dades faltants multivariants. El mètode imputa cada variable incompleta segons un model separat
+La funció _mice()_ crea múltiples imputacions per les dades faltants multivariants. El mètode imputa cada variable incompleta segons un model separat.
 
 Primer provem amb el mètode predeterminat, que és el "Predictive Mean Matching" 
 ```{r}
@@ -131,6 +131,8 @@ Observem tots el mètodes d'imputació de la funció _mice()_.
 ```{r}
 methods(mice)
 ```
+
+
 
 ## Histogrames comparatius
 Amb les següents llibraries podrem obtenir ggplots d'una manera considerablement senzilla.
@@ -155,27 +157,29 @@ Els arguments de la funció són:
                si val 2 representarem els histogrames un a sobre de l'altre pero en diferents eix y.
                
   * "NombreBins" és el nombre de "caixes" en que estarà dividit l'histograma de cadascún dels tractaments, el valor predeterminat és 10.
+  
+  * "var" és la variable sobre la que es faràn els histogrames.
  
 ```{r}
-histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,col=4){
+histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,var="BW41"){
   t1vst2 <- subset(BD,Treat == c(Tract1,Tract2))
   
   if(TipusGraf==1){
-  ggplot2.histogram(data=t1vst2, xName=colnames(BD)[col],
+  ggplot2.histogram(data=t1vst2, xName=var,
     groupName='Treat', legendPosition="top",
     alpha=0.5, addDensity=TRUE, xlim = c(100,4000), bins=NombreBins*2,
     addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
   }
 
   else{
-  ggplot2.histogram(data=t1vst2, xName='BW41',
+  ggplot2.histogram(data=t1vst2, xName=var,
          groupName='Treat', legendPosition="top", xlim = c(100,4000), bins=NombreBins*2,
         faceting=TRUE, facetingVarNames="Treat")
   }
 }
 
-histComparatius(pesInd,1,8,1,20)
-histComparatius(pesInd,1,8,2,20)
+histComparatius(pesInd,1,8,1,20,"BW41")
+histComparatius(pesInd,1,8,2,20,"BW41")
 ```
 
 
