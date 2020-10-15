@@ -11,6 +11,13 @@ output:
     keep_tex: true
 ---
 
+```{r}
+defaultW <- getOption("warn") 
+
+options(warn = -1) 
+```
+
+
 ## Tractament de les dades
 Llegim les dades.
 ```{r}
@@ -23,7 +30,7 @@ pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",            
 
 Comprovem que les dades s'han llegit com voliem.
 ```{r}
-View(pesInd)
+# View(pesInd)
 names(pesInd)
 dim(pesInd)
 ```
@@ -105,6 +112,46 @@ pesIndEstNA[!complete.cases(pesInd$BW41),]$BW41 <- predCasosNA
 ```
 
 
+### Calcular l'error típic de la predicció que depèn de cada dada faltant i generar una normal centrada en el punt de la recta i amb desviació l'error típic.
+
+```{r}
+mod1 <- lm(BW41 ~ BW28, data = pesInd)
+summary(mod1)
+```
+
+```{r}
+plot(pesInd$BW28, pesInd$BW41)
+abline(mod1)
+abline(v=casosNA$BW28,col="blue",lty=2)
+```
+
+
+```{r}
+predlm <- predict.lm(mod1,newdata = casosNA[,"BW28"])
+
+k=length(mod1$coefficients)-1 #Subtract one to ignore intercept
+SSE=sum(mod1$residuals**2)
+n=length(mod1$residuals)
+RSE <- sqrt(SSE/(n-(1+k)))
+
+# modresNA <- mod1$residuals[!complete.cases(pesInd$BW41)]
+
+newpred <- numeric(nrow(casosNA))
+for(i in 1:nrow(casosNA)){
+  newpred[i] <- rnorm(1, mean = predlm[i], sd = RSE)
+}
+
+newpred
+
+pesIndEstNA2 <- pesInd
+pesIndEstNA2[!complete.cases(pesInd$BW41),]$BW41 <- newpred
+```
+
+
+
+
+
+
 ##### Package "mice"
 
 ```{r}
@@ -167,40 +214,76 @@ histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,va
   if(TipusGraf==1){
   ggplot2.histogram(data=t1vst2, xName=var,
     groupName='Treat', legendPosition="top",
-    alpha=0.5, addDensity=TRUE, xlim = c(100,4000), bins=NombreBins*2,
-    addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
+    alpha=0.5, addDensity=TRUE, bins=NombreBins*2)
+    #, addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
   }
 
   else{
   ggplot2.histogram(data=t1vst2, xName=var,
-         groupName='Treat', legendPosition="top", xlim = c(100,4000), bins=NombreBins*2,
+         groupName='Treat', legendPosition="top", bins=NombreBins*2,
         faceting=TRUE, facetingVarNames="Treat")
   }
 }
-
-histComparatius(pesInd,1,8,1,20,"BW41")
-histComparatius(pesInd,1,8,2,20,"BW41")
 ```
 
 
-Fem els histogrames de tipus 2 de tots els tractaments enfront el tractament de control:
+Package per a fer layouts de ggplot2
+```{r fig.height=4, fig.width=8}
+# devtools::install_github("thomasp85/patchwork")
 
+library(patchwork)
+
+histComparatius(pesInd,1,8,1,10,"BW41") + histComparatius(pesInd,1,8,2,10,"BW41")
+```
+
+Creem les següents varibles d'interès.
+
+Guany de pes:
 ```{r}
-histComparatius(pesInd,1,2,2)
-histComparatius(pesInd,1,3,2)
-histComparatius(pesInd,1,4,2)
-histComparatius(pesInd,1,5,2)
-histComparatius(pesInd,1,6,2)
-histComparatius(pesInd,1,7,2)
-histComparatius(pesInd,1,8,2)
+pesInd$difBW41_28 <- pesInd$BW41-pesInd$BW28
 ```
+
+Index de l'increment de pes:
+```{r}
+pesInd$indexBW41_28 <- 100*pesInd$BW41/pesInd$BW28                   
+```
+
+Taxa de l'increment de pes:
+```{r}
+pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28    
+```
+
+
+Histogrames de les noves variables:
+```{r fig.height=4, fig.width=8}
+histComparatius(pesInd,1,8,1,20,"difBW41_28") +
+histComparatius(pesInd,1,8,1,20,"indexBW41_28") +
+histComparatius(pesInd,1,8,1,20,"taxBW41_28")
+```
+
+
+### Layout de plots
+```{r fig.height=4, fig.width=8}
+p <- list(numeric(7))
+for(i in 1:7){
+  p[[i]] <- histComparatius(pesInd,1,i+1,1,20,"difBW41_28")
+}
+
+p[[1]] + p[[2]]
+p[[3]] + p[[4]]
+p[[5]] + p[[6]]
+p[[7]] + ggplot()
+```
+
+
+
 
 
 ## Funcions del paquet _snpar_
 ```{r}
 # install.packages("snpar")
 library(snpar)
-help("snpar")
+# help("snpar")
 library(help = snpar)
 ```
 
@@ -225,8 +308,4 @@ https://cran.r-project.org/web/packages/snpar/snpar.pdf
 
 
 
-```{r}
-plot(pesInd$BW28, pesInd$BW41)
-```
 
-Calcular l'error típic de la predicció que depèn de cada dada faltant i generar una normal centrada en el punt de la recta i amb desviació l'error típic.
