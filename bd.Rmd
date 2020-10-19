@@ -165,13 +165,25 @@ La funció _mice()_ crea múltiples imputacions per les dades faltants multivari
 
 Primer provem amb el mètode predeterminat, que és el "Predictive Mean Matching" 
 ```{r}
-MicePmm <- mice(pesInd)
-summary(MicePmm)
+MiceNorm <- mice(pesInd, method = "norm")
+summary(MiceNorm)
 ```
+
+```{r}
+MiceSample <- mice(pesInd, method = "sample")
+summary(MiceSample)
+```
+
 
 A continuació completem les dades amb _complete()_:
 ```{r}
-pesIndMicePmm <- complete(MicePmm)
+MiceNorm$imp$BW41
+pesIndMiceNorm <- complete(MiceNorm,2)
+
+MiceSample$imp$BW41
+pesIndMiceSample <- complete(MiceSample)
+
+hist(pesInd$BW41);hist(pesIndMiceNorm$BW41);hist(pesIndMiceSample$BW41)
 ```
 
 Observem tots el mètodes d'imputació de la funció _mice()_.
@@ -284,7 +296,7 @@ p[[7]] + ggplot()
 # install.packages("snpar")
 library(snpar)
 # help("snpar")
-library(help = snpar)
+# library(help = snpar)
 ```
 
 Observem que segons la _R Documentation_ del package, aquest ens proporciona Mètodes Estadístics Suplementaris No-Paramètrics. 
@@ -306,6 +318,19 @@ https://cran.r-project.org/web/packages/snpar/snpar.pdf
   * Runs Test for Randomness - **runs.test** - Realitza un test per a l'aleatorietat d'una seqüència numèrica.
 
 
+### quant.test
+https://rdrr.io/cran/snpar/man/quant.test.html
+http://bios.unc.edu/~kosorok/909.pdf
+
+```{r}
+quantile(subset(pesInd,Treat == 1)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+quantile(subset(pesInd,Treat == 2)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+histComparatius(pesInd, 1, 2, 1, var = "difBW41_28")
+  
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
+```
 
 
 
