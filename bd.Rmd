@@ -22,8 +22,8 @@ options(warn = -1)
 Llegim les dades.
 ```{r}
 library(readxl)
-#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
 ##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
 
 ```
@@ -115,11 +115,26 @@ pesIndEstNA[!complete.cases(pesInd$BW41),]$BW41 <- predCasosNA
 ### Calcular l'error típic de la predicció que depèn de cada dada faltant i generar una normal centrada en el punt de la recta i amb desviació l'error típic.
 
 ```{r}
-mod1 <- lm(BW41 ~ BW28, data = pesInd)
-summary(mod1)
+mod1 <- lm(BW41 ~ BW28 + Treat, data = pesInd, x=T, y=T)
+smod1 <- summary(mod1)
+
+MSE <- smod1$sigma^2
+X <- mod1$x
+B <- solve(t(X) %*% X)
+class(mod1$x)
+
+x_h <- matrix(c(1,796,0,0,0,0,0,0,0),ncol=1)
+h <- t(x_h) %*% B %*% x_h
+et <- sqrt(MSE*(1-h)) # error típic
+
+mh <- as.numeric(t(x_h) %*% smod1$coefficients[,1])
+rnorm(1,mh,et)
+
+summary(pesInd$BW41)
 ```
 
 ```{r}
+casosNA
 plot(pesInd$BW28, pesInd$BW41)
 abline(mod1)
 abline(v=casosNA$BW28,col="blue",lty=2)
@@ -239,6 +254,7 @@ histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,va
 ```
 
 
+
 Package per a fer layouts de ggplot2
 ```{r fig.height=4, fig.width=8}
 # devtools::install_github("thomasp85/patchwork")
@@ -268,9 +284,9 @@ pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28
 
 Histogrames de les noves variables:
 ```{r fig.height=4, fig.width=8}
-histComparatius(pesInd,1,8,1,20,"difBW41_28") +
-histComparatius(pesInd,1,8,1,20,"indexBW41_28") +
-histComparatius(pesInd,1,8,1,20,"taxBW41_28")
+histComparatius(pesInd,1,3,1,10,"difBW41_28") +
+histComparatius(pesInd,1,3,1,10,"indexBW41_28") +
+histComparatius(pesInd,1,3,1,10,"taxBW41_28")
 ```
 
 
@@ -278,7 +294,7 @@ histComparatius(pesInd,1,8,1,20,"taxBW41_28")
 ```{r fig.height=4, fig.width=8}
 p <- list(numeric(7))
 for(i in 1:7){
-  p[[i]] <- histComparatius(pesInd,1,i+1,1,20,"difBW41_28")
+  p[[i]] <- histComparatius(pesInd,1,i+1,1,10,"difBW41_28")
 }
 
 p[[1]] + p[[2]]
@@ -319,18 +335,100 @@ https://cran.r-project.org/web/packages/snpar/snpar.pdf
 
 
 ### quant.test
+
+  * Examina l'igualtat de localitzacions de dues mostres.
+  
+  * No requereix de l'assumpció de normalitat de les dades.
+  
+  * Té menys poder estadístic que el t-test quan les hipòtesis de normalitat es compleixen.
+
 https://rdrr.io/cran/snpar/man/quant.test.html
 http://bios.unc.edu/~kosorok/909.pdf
+
+
+$$
+\text{Quantile Test}\\
+
+\begin{cases}
+H_0: \text{Els quantils són iguals a les dues mostres.}\\
+H_1: \text{Els quantils no són iguals a les dues mostres.}
+\end{cases}
+$$
+
+```{r}
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 3)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 4)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 5)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 6)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 7)$difBW41_28)
+
+quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 8)$difBW41_28)
+```
+
+
+Observem que el test resulta significatiu per als tractaments 3,4,5 i 8, de manera que tenim prou evidències per rebutjar l'hipòtesi nul·la d'igualtat dels quantils de les mostres.
+
+Printem els histogrames per a poder veure les diferències entre tractaments.
 
 ```{r}
 quantile(subset(pesInd,Treat == 1)$difBW41_28, c(0.25,0.75), na.rm = T)
   
-quantile(subset(pesInd,Treat == 2)$difBW41_28, c(0.25,0.75), na.rm = T)
+quantile(subset(pesInd,Treat == 3)$difBW41_28, c(0.25,0.75), na.rm = T)
   
-histComparatius(pesInd, 1, 2, 1, var = "difBW41_28")
-  
-quant.test(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
+histComparatius(pesInd, 1, 3, 1, var = "difBW41_28")
 ```
+
+```{r}
+quantile(subset(pesInd,Treat == 1)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+quantile(subset(pesInd,Treat == 4)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+histComparatius(pesInd, 1, 4, 1, var = "difBW41_28")
+```
+
+
+```{r}
+quantile(subset(pesInd,Treat == 1)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+quantile(subset(pesInd,Treat == 5)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+histComparatius(pesInd, 1, 5, 1, var = "difBW41_28")
+```
+
+
+```{r}
+quantile(subset(pesInd,Treat == 1)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+quantile(subset(pesInd,Treat == 8)$difBW41_28, c(0.25,0.75), na.rm = T)
+  
+histComparatius(pesInd, 1, 8, 1, var = "difBW41_28")
+```
+
+
+```{r}
+quantile(subset(pesInd,Treat == 1)$difBW41_28, 0.1, na.rm = T)
+quant.test(subset(pesInd,Treat == 3)$difBW41_28, p = 0.1, q = 326 )
+quant.test(subset(pesInd,Treat == 2)$difBW41_28, p = 0.1, q = 326 )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
