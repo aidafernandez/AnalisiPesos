@@ -142,24 +142,24 @@ abline(v=casosNA$BW28,col="blue",lty=2)
 
 
 ```{r}
-predlm <- predict.lm(mod1,newdata = casosNA[,"BW28"])
-
-k=length(mod1$coefficients)-1 #Subtract one to ignore intercept
-SSE=sum(mod1$residuals**2)
-n=length(mod1$residuals)
-RSE <- sqrt(SSE/(n-(1+k)))
-
-# modresNA <- mod1$residuals[!complete.cases(pesInd$BW41)]
-
-newpred <- numeric(nrow(casosNA))
-for(i in 1:nrow(casosNA)){
-  newpred[i] <- rnorm(1, mean = predlm[i], sd = RSE)
-}
-
-newpred
-
-pesIndEstNA2 <- pesInd
-pesIndEstNA2[!complete.cases(pesInd$BW41),]$BW41 <- newpred
+# predlm <- predict.lm(mod1,newdata = casosNA[,"BW28"])
+# 
+# k=length(mod1$coefficients)-1 #Subtract one to ignore intercept
+# SSE=sum(mod1$residuals**2)
+# n=length(mod1$residuals)
+# RSE <- sqrt(SSE/(n-(1+k)))
+# 
+# # modresNA <- mod1$residuals[!complete.cases(pesInd$BW41)]
+# 
+# newpred <- numeric(nrow(casosNA))
+# for(i in 1:nrow(casosNA)){
+#   newpred[i] <- rnorm(1, mean = predlm[i], sd = RSE)
+# }
+# 
+# newpred
+# 
+# pesIndEstNA2 <- pesInd
+# pesIndEstNA2[!complete.cases(pesInd$BW41),]$BW41 <- newpred
 ```
 
 
@@ -418,13 +418,84 @@ quant.test(subset(pesInd,Treat == 2)$difBW41_28, p = 0.1, q = 326 )
 ```
 
 
+### The shift function: a powerful tool to compare two entire distributions
+
+\url{https://garstats.wordpress.com/2016/07/12/shift-function/}
 
 
+```{r}
+#install.packages("WRS")
+#install.packages("Rtools")
+library(devtools)
+devtools::install_github("nicebread/WRS",subdir = "pkg",force=T)
+library(WRS)
+```
 
 
+```{r}
+help("WRS")
+??WRS
+help(sband)
+??sband
 
+sband12 <- sband(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
 
+sband12
 
+#shifthd(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
+```
+
+### Two-Sample Rank Test To Detect A Shift In A Proportion Of The "Treated" Population
+
+```{r}
+library(EnvStats)
+```
+
+Test bi-mostral per detectar un canvi positiu en una proporció de la població (tractament) comparada a una altra (control).
+
+quantileTest(x, y, alternative = "greater", target.quantile = 0.5, 
+    target.r = NULL, exact.p = TRUE)
+    
+  * $x$: Vector numèric d'observacions del grup tractament.
+  
+  * $y$: Vector numèric d'observacions del grup control.
+  
+  * $alternative$: Tipus d'hipòtesi alternativa.
+  
+      - "greater": La cua dreta del grup tractament desplaçada cap a la dreta de la cua dreta del grup control.
+      
+      - "less": La cua esquerra del grup tractament desplaçada cap a la esquerra de la cua esquerra del grup control.
+  
+  * $target.quantile$: Quantil utilitzat com a punt de tall inferior per a la prova. A causa de la naturalesa discreta dels quantils empírics, el límit superior dels possibles quantils empírics sovint difereix del valor de target.quantile.
+  
+$$
+\begin{cases}
+H_1: \text{ La porció } \epsilon \text{ de la distribució per al grup de tractament (la distribució de X) es desplaça cap a la dreta de la distribució per al grup de referència (la distribució de Y).}
+\end{cases}
+$$
+
+```{r}
+help("quantileTest")
+
+quantileTest(
+  subset(pesInd,Treat == 2)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 3)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 3)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.1,
+  alternative = "greater")
+
+```
 
 
 
