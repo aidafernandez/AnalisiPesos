@@ -1,0 +1,233 @@
+---
+title: "BD"
+author: "Aida Fernandez, 1497182"
+fontsize: 11pt
+documentclass: article
+output:
+  html_document:
+    df_print: paged
+    number_sections: false
+  pdf_document: 
+    keep_tex: true
+---
+
+```{r}
+defaultW <- getOption("warn") 
+
+options(warn = -1) 
+```
+
+## Tractament de les dades
+Llegim les dades.
+```{r}
+library(readxl)
+pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
+```
+
+
+Posem les variables "Box" i "Treat" com a factors.
+```{r}
+pesInd$Box <- as.factor(pesInd$Box)
+pesInd$Treat <- as.factor(pesInd$Treat)
+
+levels(pesInd$Box)
+levels(pesInd$Treat)
+```
+
+
+Creem les següents varibles d'interès.
+
+Guany de pes:
+```{r}
+pesInd$difBW41_28 <- pesInd$BW41-pesInd$BW28
+```
+
+Index de l'increment de pes:
+```{r}
+pesInd$indexBW41_28 <- 100*pesInd$BW41/pesInd$BW28                   
+```
+
+Taxa de l'increment de pes:
+```{r}
+pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28    
+```
+
+
+
+### Tractament de les dades faltants
+Preguntar.
+
+
+#### Eliminació de les dades faltants
+Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
+
+```{r}
+pesIndOmitNA <- na.omit(pesInd)
+```
+
+
+## Histogrames comparatius
+
+Package per a fer layouts de ggplot2
+```{r}
+# devtools::install_github("thomasp85/patchwork")
+library(patchwork)
+```
+
+Amb les següents llibraries podrem obtenir ggplots d'una manera considerablement senzilla.
+```{r}
+library(ggplot2)
+# install.packages("devtools")
+library(devtools)
+# devtools::install_github("kassambara/easyGgplot2")
+library(easyGgplot2)
+```
+
+Funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
+Els arguments de la funció són:
+
+  * "BD" la base de dades.
+  
+  * "Trac1" i "Tract2" són els tractaments a comparar.
+  
+  * "TipusGraf" si és 1 representem els histogrames solapant-se al mateix eix de les y,
+               si val 2 representarem els histogrames un a sobre de l'altre pero en diferents eix y.
+               
+  * "NombreBins" és el nombre de "caixes" en que estarà dividit l'histograma de cadascún dels tractaments, el valor predeterminat és 10.
+  
+  * "var" és la variable sobre la que es faràn els histogrames.
+ 
+```{r}
+histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,var="BW41"){
+  t1vst2 <- subset(BD,Treat == c(Tract1,Tract2))
+  
+  if(TipusGraf==1){
+  ggplot2.histogram(data=t1vst2, xName=var,
+    groupName='Treat', legendPosition="top",
+    alpha=0.5, addDensity=TRUE, bins=NombreBins*2)
+    #, addMeanLine=TRUE, meanLineColor="white", meanLineSize=1.5)
+  }
+
+  else{
+  ggplot2.histogram(data=t1vst2, xName=var,
+         groupName='Treat', legendPosition="top", bins=NombreBins*2,
+        faceting=TRUE, facetingVarNames="Treat")
+  }
+}
+```
+
+Histogrames de les noves variables:
+```{r fig.height=4, fig.width=8}
+histComparatius(pesInd,1,3,1,10,"difBW41_28") +
+histComparatius(pesInd,1,3,1,10,"indexBW41_28") +
+histComparatius(pesInd,1,3,1,10,"taxBW41_28")
+```
+
+### Layout de plots
+```{r fig.height=4, fig.width=8}
+p <- list(numeric(7))
+for(i in 1:7){
+  p[[i]] <- histComparatius(pesInd,1,i+1,1,10,"difBW41_28")
+}
+
+p[[1]] + p[[2]]
+p[[3]] + p[[4]]
+p[[5]] + p[[6]]
+p[[7]] + ggplot()
+```
+
+
+### Two-Sample Rank Test To Detect A Shift In A Proportion Of The "Treated" Population
+
+```{r}
+library(EnvStats)
+```
+
+Test bi-mostral per detectar un canvi positiu en una proporció de la població (tractament) comparada a una altra (control).
+
+quantileTest(x, y, alternative = "greater", target.quantile = 0.5, 
+    target.r = NULL, exact.p = TRUE)
+    
+  * $x$: Vector numèric d'observacions del grup tractament.
+  
+  * $y$: Vector numèric d'observacions del grup control.
+  
+  * $alternative$: Tipus d'hipòtesi alternativa.
+  
+      - "greater": La cua dreta del grup tractament desplaçada cap a la dreta de la cua dreta del grup control.
+      
+      - "less": La cua esquerra del grup tractament desplaçada cap a la esquerra de la cua esquerra del grup control.
+  
+  * $target.quantile$: Quantil utilitzat com a punt de tall inferior per a la prova. A causa de la naturalesa discreta dels quantils empírics, el límit superior dels possibles quantils empírics sovint difereix del valor de target.quantile.
+  
+_$H_1:$ La porció $\epsilon$ de la distribució per al grup de tractament (la distribució de X) es desplaça cap a la dreta de la distribució per al grup de referència (la distribució de Y)._
+
+
+```{r}
+help("quantileTest")
+
+quantileTest(
+  subset(pesInd,Treat == 2)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 3)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 3)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.25,
+  alternative = "greater")
+
+```
+
+
+## Skewness i Kurtosi
+```{r}
+# library(moments)
+skew <- numeric(length(levels(pesInd$Treat)))
+kurt <- numeric(length(levels(pesInd$Treat)))
+
+for(i in 1:length(levels(pesInd$Treat))){
+  skew[i] <- skewness(subset(pesInd,Treat == i)$taxBW41_28,na.rm = T)
+  
+  kurt[i] <- kurtosis(subset(pesInd,Treat == i)$taxBW41_28,na.rm = T)
+}
+
+as.matrix(skew)
+as.matrix(kurt)
+```
+
+Observem que per la taxa de tots els tractaments existeix una skewness positiva en major o menor mesura, és a dir una cua més llarga a la dreta. Cal destacar que la taxa del tractament 3 podria considerarse pràcticament simètrica.
+
+
+En quant a la curtosi observem que tots els valors són prou propers a 3, de manera que podrien considerarse mesocúrtiques i lleugerament leptocúrtiques (amb pic i cues primes). Destaquen el tractament 4 molt leptoicúrtic i el tractament 7 lleugerament platicúrtic.
+
+
+
+## Costos
+
+Coste/kg PV (€/kg): La fórmula es: (coste pienso [€/kg] * consumo pienso [kg]) / ganancia peso [kg]
+
+```{r}
+library(readxl)
+CalculoIndices <- read_excel("G:/GEA4/PRACTIQUES/CalculoIndices.xlsx",     sheet = "Coste_per PV (2)", range = "A13:Q93")
+names(CalculoIndices)
+
+costos <- CalculoIndices[,"Coste/kg PV (Finisher)"]
+
+costos$Box <- as.factor(CalculoIndices$Corral)
+costos$Treat <- as.factor(CalculoIndices$Treat)
+
+costos
+
+pesInd <- merge(pesInd,costos,by=c("Box","Treat"))
+```
+

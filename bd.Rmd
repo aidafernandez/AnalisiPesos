@@ -22,8 +22,8 @@ options(warn = -1)
 Llegim les dades.
 ```{r}
 library(readxl)
-pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
 ##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
 
 ```
@@ -217,8 +217,6 @@ library(devtools)
 # devtools::install_github("kassambara/easyGgplot2")
 library(easyGgplot2)
 ```
-
-*** He intuit que el pes que es vol comparar és el de les 41 setmanes.
 
 Funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
 Els arguments de la funció són:
@@ -427,7 +425,7 @@ quant.test(subset(pesInd,Treat == 2)$difBW41_28, p = 0.1, q = 326 )
 #install.packages("WRS")
 #install.packages("Rtools")
 library(devtools)
-devtools::install_github("nicebread/WRS",subdir = "pkg",force=T)
+#devtools::install_github("nicebread/WRS",subdir = "pkg",force=T)
 library(WRS)
 ```
 
@@ -441,6 +439,7 @@ help(sband)
 sband12 <- sband(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
 
 sband12
+
 
 #shifthd(subset(pesInd,Treat == 1)$difBW41_28,subset(pesInd,Treat == 2)$difBW41_28)
 ```
@@ -492,10 +491,15 @@ quantileTest(
 quantileTest(
   subset(pesInd,Treat == 3)$difBW41_28,
   subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.1,
+  target.quantile = 0.25,
   alternative = "greater")
 
 ```
+
+```{r}
+table(pesInd$Box,pesInd$Treat)
+```
+
 
 
 
