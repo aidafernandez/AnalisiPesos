@@ -1,5 +1,5 @@
 ---
-title: "BD"
+title: "Tractament vs. Control"
 author: "Aida Fernandez, 1497182"
 fontsize: 11pt
 documentclass: article
@@ -11,18 +11,18 @@ output:
     keep_tex: true
 ---
 
-```{r}
-defaultW <- getOption("warn") 
 
-options(warn = -1) 
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=4,                     echo=FALSE, warning=FALSE, message=FALSE)
 ```
 
-## Tractament de les dades
-Llegim les dades.
+
+## Gestió de les dades
+Llegim les dades _pesosIndividuales.xlsx_
 ```{r}
 library(readxl)
-pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
 ##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
 ```
 
@@ -57,8 +57,6 @@ pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28
 
 
 ### Tractament de les dades faltants
-Preguntar.
-
 
 #### Eliminació de les dades faltants
 Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
@@ -68,13 +66,14 @@ pesIndOmitNA <- na.omit(pesInd)
 ```
 
 
-## Histogrames comparatius
+## Comparació gràfica
 
 Package per a fer layouts de ggplot2
 ```{r}
 # devtools::install_github("thomasp85/patchwork")
 library(patchwork)
 ```
+
 
 Amb les següents llibraries podrem obtenir ggplots d'una manera considerablement senzilla.
 ```{r}
@@ -119,24 +118,47 @@ histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,va
 ```
 
 Histogrames de les noves variables:
-```{r fig.height=4, fig.width=8}
-histComparatius(pesInd,1,3,1,10,"difBW41_28") +
+```{r}
+#par(cex.lab=0.02) # is for y-axis No va
+
+histComparatius(pesInd,1,3,1,10,"BW41")+
+histComparatius(pesInd,1,3,1,10,"difBW41_28")
+
 histComparatius(pesInd,1,3,1,10,"indexBW41_28") +
 histComparatius(pesInd,1,3,1,10,"taxBW41_28")
 ```
 
-### Layout de plots
-```{r fig.height=4, fig.width=8}
+### Comparació de tots els tractaments amb el control
+```{r}
 p <- list(numeric(7))
+p1 <- list(numeric(7))
 for(i in 1:7){
   p[[i]] <- histComparatius(pesInd,1,i+1,1,10,"difBW41_28")
+  p1[[i]] <- histComparatius(pesInd,1,i+1,1,10,"BW41")
 }
+```
 
+
+#### Variable _BW41_
+
+```{r}
+p1[[1]] + p1[[2]]
+p1[[3]] + p1[[4]]
+p1[[5]] + p1[[6]]
+p1[[7]] + ggplot()
+```
+
+
+#### Variable _difBW41_28_
+
+```{r}
 p[[1]] + p[[2]]
 p[[3]] + p[[4]]
 p[[5]] + p[[6]]
 p[[7]] + ggplot()
 ```
+
+
 
 
 ### Two-Sample Rank Test To Detect A Shift In A Proportion Of The "Treated" Population
@@ -166,7 +188,7 @@ _$H_1:$ La porció $\epsilon$ de la distribució per al grup de tractament (la d
 
 
 ```{r}
-help("quantileTest")
+#help("quantileTest")
 
 quantileTest(
   subset(pesInd,Treat == 2)$difBW41_28,
@@ -218,7 +240,7 @@ Coste/kg PV (€/kg): La fórmula es: (coste pienso [€/kg] * consumo pienso [k
 
 ```{r}
 library(readxl)
-CalculoIndices <- read_excel("G:/GEA4/PRACTIQUES/CalculoIndices.xlsx",     sheet = "Coste_per PV (2)", range = "A13:Q93")
+CalculoIndices <- read_excel("E:/GEA4/PRACTIQUES/CalculoIndices.xlsx",     sheet = "Coste_per PV (2)", range = "A13:Q93")
 names(CalculoIndices)
 
 costos <- CalculoIndices[,"Coste/kg PV (Finisher)"]
@@ -226,8 +248,77 @@ costos <- CalculoIndices[,"Coste/kg PV (Finisher)"]
 costos$Box <- as.factor(CalculoIndices$Corral)
 costos$Treat <- as.factor(CalculoIndices$Treat)
 
-costos
+colnames(costos) <- c("Cost","Box","Treat")
 
 pesInd <- merge(pesInd,costos,by=c("Box","Treat"))
+```
+
+
+```{r}
+hist(pesInd$Cost)
+hist(log(pesInd$Cost))
+```
+
+https://www.statisticssolutions.com/transforming-data-for-normality/
+https://rcompanion.org/handbook/I_12.html
+```{r}
+library(ggpubr)
+
+c1 <- costos$Cost
+ggdensity(c1) + ggqqplot(c1)
+shapiro.test(c1)
+
+c2 <- log(costos$Cost)
+ggdensity(c2) + ggqqplot(c2)
+shapiro.test(c2)
+
+c3 <- asin(sqrt(costos$Cost))
+ggdensity(c3) + ggqqplot(c3)
+shapiro.test(c3)
+
+c4 <- log(costos$Cost/(1-costos$Cost))
+ggdensity(c4) + ggqqplot(c4)
+shapiro.test(c4)
+
+#install.packages("rcompanion")
+library(rcompanion)
+c5 <- transformTukey(costos$Cost,plotit = F)
+ggdensity(c5) + ggqqplot(c5)
+shapiro.test(c5)
+
+library(MASS)
+Box <- boxcox(Cost ~ 1, data = costos)
+Cox = data.frame(Box$x, Box$y)            # Create a data frame with the results
+Cox2 = Cox[with(Cox, order(-Cox$Box.y)),] # Order the new data frame by decreasing y
+lambda = Cox2[1, "Box.x"]                 # Extract that lambda
+c6 = (costos$Cost ^ lambda - 1)/lambda   # Transform the original data
+ggdensity(c6) + ggqqplot(c6)
+shapiro.test(c6)
+```
+
+```{r}
+costos$CostTuk <- c5
+```
+
+
+https://www.sheffield.ac.uk/polopoly_fs/1.536444!/file/MASH_2way_ANOVA_in_R.pdf
+```{r}
+#table(costos$Box,costos$Treat)
+#table(costos$Cost,costos$Box)
+
+#install.packages("ggpubr")
+library(ggpubr)
+
+#plot(costos$Box,costos$Cost)
+
+ggboxplot(costos, x = "Treat", y = "Cost", color = "Treat")
+
+anova2<-aov(CostTuk~as.factor(Treat)*as.factor(Box),data=costos)
+summary(anova2)
+res <- anova2$residuals
+hist(res,main="Histogram of the residuals",xlab="Residuals")
+
+library(car)
+leveneTest(CostTuk~as.factor(Treat)*as.factor(Box),data=costos)
 ```
 
