@@ -254,11 +254,6 @@ pesInd <- merge(pesInd,costos,by=c("Box","Treat"))
 ```
 
 
-```{r}
-hist(pesInd$Cost)
-hist(log(pesInd$Cost))
-```
-
 https://www.statisticssolutions.com/transforming-data-for-normality/
 https://rcompanion.org/handbook/I_12.html
 ```{r}
@@ -301,24 +296,62 @@ costos$CostTuk <- c5
 ```
 
 
-https://www.sheffield.ac.uk/polopoly_fs/1.536444!/file/MASH_2way_ANOVA_in_R.pdf
+http://www.sthda.com/english/wiki/one-way-anova-test-in-r
 ```{r}
-#table(costos$Box,costos$Treat)
-#table(costos$Cost,costos$Box)
-
 #install.packages("ggpubr")
 library(ggpubr)
-
-#plot(costos$Box,costos$Cost)
+str(costos)
+costos$Box <- as.numeric(costos$Box)
 
 ggboxplot(costos, x = "Treat", y = "Cost", color = "Treat")
 
-anova2<-aov(CostTuk~as.factor(Treat)*as.factor(Box),data=costos)
-summary(anova2)
-res <- anova2$residuals
-hist(res,main="Histogram of the residuals",xlab="Residuals")
+ggline(costos, x = "Treat", y = "Cost", 
+       add = c("mean_se", "jitter"), 
+       ylab = "Cost", xlab = "Treatment")
 
+anova<-aov(CostTuk~Treat,data=costos)
+summary(anova)
+```
+
+Tukey multiple pairwise-comparisons
+```{r}
+TukeyHSD(anova)
+TukeyHSD(anova)$Treat[c(1:7),]
+```
+
+Multiple comparisons using multcomp package
+```{r}
+library(multcomp)
+summary(glht(anova, linfct = mcp(Treat = "Tukey")))
+```
+
+Pairewise t-test
+```{r}
+pairwise.t.test(costos$CostTuk, costos$Treat,
+                 p.adjust.method = "BH")
+```
+
+Check ANOVA assumptions: test validity?
+
+Check the homogeneity of variance assumption
+```{r}
+# 1. Homogeneity of variances
+plot(anova, 1)
+```
+
+```{r}
 library(car)
-leveneTest(CostTuk~as.factor(Treat)*as.factor(Box),data=costos)
+leveneTest(CostTuk ~ Treat, data = costos)
+```
+
+```{r}
+# 2. Normality
+plot(anova, 2)
+shapiro.test(residuals(anova))
+```
+
+Non-parametric alternative to one-way ANOVA test
+```{r}
+kruskal.test(CostTuk ~ Treat, data = costos)
 ```
 
