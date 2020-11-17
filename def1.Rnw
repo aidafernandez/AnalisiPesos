@@ -1,0 +1,157 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+%\usepackage[catalan]{babel}
+\usepackage[left=2.5cm,top=3cm,bottom=3cm,right=2.5cm]{geometry}   % text margins
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{hyperref}                      % link to website: \url{}.
+\usepackage[hang,footnotesize,bf]{caption} % customized caption
+\usepackage{enumitem}
+\usepackage{authblk}
+\usepackage{mathtools}
+\usepackage{booktabs}                      % for booktabs in print(xtable)). 
+
+%\pagestyle{fancy}
+%\fancyhf{}
+%\lhead{Cross-sectional Data Analysis (Assignments)}
+%\rhead{Aida Fernandez - 1497182}
+%\cfoot{\thepage}
+
+\begin{document}
+
+<<>>=
+library(readxl)
+#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
+@
+
+<<>>=
+pesInd$Box <- as.factor(pesInd$Box)
+pesInd$Treat <- as.factor(pesInd$Treat)
+
+levels(pesInd$Box)
+levels(pesInd$Treat)
+@
+
+<<>>=
+pesInd$difBW41_28 <- pesInd$BW41-pesInd$BW28
+pesInd$indexBW41_28 <- 100*pesInd$BW41/pesInd$BW28   
+pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28    
+@
+
+<<>>=
+library(EnvStats)
+#help("quantileTest")
+
+qtest12 <- quantileTest(
+  subset(pesInd,Treat == 2)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest13 <- quantileTest(
+  subset(pesInd,Treat == 3)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest14 <- quantileTest(
+  subset(pesInd,Treat == 4)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest15 <- quantileTest(
+  subset(pesInd,Treat == 5)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest16 <- quantileTest(
+  subset(pesInd,Treat == 6)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest17 <- quantileTest(
+  subset(pesInd,Treat == 7)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest18 <- quantileTest(
+  subset(pesInd,Treat == 8)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 2)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+@
+
+
+<<>>=
+library(xtable)
+@
+
+\clearpage
+<<results = 'asis',echo=F>>=
+tract <- c(1,2,"",1,3,"",1,4,"",1,5,"",1,6,"",1,7,"",1,8,"")
+quant <- numeric(8)
+for(i in 1:8){
+  quant[i] <- quantile(subset(pesInd,Treat == i)$difBW41_28,0.2,na.rm = T)
+}
+quant <- as.numeric(quant)
+quant1 <- c(quant[c(1,2)],"",quant[c(1,3)],"",quant[c(1,4)],"",quant[c(1,5)],"",quant[c(1,6)],"",quant[c(1,7)],"",quant[c(1,8)],"")
+#quant1 <- as.numeric(quant1)
+
+pval <- c(qtest12$p.value,"","",qtest13$p.value,"","",qtest14$p.value,"","",qtest15$p.value,"","",qtest16$p.value,"","",qtest17$p.value,"","",qtest18$p.value,"","")
+pval <- as.numeric(pval)
+pval <- round(pval,4)
+tottab <- cbind(tract,quant1,pval)
+
+colnames(tottab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+
+deftab <- xtable(tottab,caption="Taula d'anàlisi de quantiles",label="tab:tot")
+deftab
+
+
+print(deftab,include.rownames = F)
+
+#colnames(deftab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+
+
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+#white <- function(x) {paste('{\\textcolor{white}{',x,'}}', sep ='')}
+
+
+print(deftab,size ="\\fontsize{7.5pt}{7pt}\\selectfont",
+      include.rownames = F,
+      include.colnames = TRUE,
+      floating = TRUE,                 # whether \begin{table} should be created (TRUE) or not (FALSE)
+      sanitize.colnames.function=bold,  
+      #sanitize.rownames.function=white,
+      # important to treat content of columns as latex function
+      booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
+@
+
+
+
+Per exemple si
+> a <- xtable(taula)
+
+I faig
+> a
+Em funciona 
+
+Pero si faig
+> print(a)
+
+No em funciona
+
+\end{document}

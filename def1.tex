@@ -1,0 +1,196 @@
+\documentclass[11pt,a4paper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+%\usepackage[catalan]{babel}
+\usepackage[left=2.5cm,top=3cm,bottom=3cm,right=2.5cm]{geometry}   % text margins
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{hyperref}                      % link to website: \url{}.
+\usepackage[hang,footnotesize,bf]{caption} % customized caption
+\usepackage{enumitem}
+\usepackage{authblk}
+\usepackage{mathtools}
+\usepackage{booktabs}                      % for booktabs in print(xtable)). 
+
+%\pagestyle{fancy}
+%\fancyhf{}
+%\lhead{Cross-sectional Data Analysis (Assignments)}
+%\rhead{Aida Fernandez - 1497182}
+%\cfoot{\thepage}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+##  [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11"
+## [12] "12" "13" "14" "15" "16" "17" "18" "19" "20" "21" "22"
+## [23] "23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "33"
+## [34] "34" "35" "36" "37" "38" "39" "40" "41" "42" "43" "44"
+## [45] "45" "46" "47" "48" "49" "50" "51" "52" "53" "54" "55"
+## [56] "56" "57" "58" "59" "60" "61" "62" "63" "64" "65" "66"
+## [67] "67" "68" "69" "70" "71" "72" "73" "74" "75" "76" "77"
+## [78] "78" "79" "80"
+## [1] "1" "2" "3" "4" "5" "6" "7" "8"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## 
+## 	Quantile Test
+## 
+## data:  subset(pesInd, Treat == 2)$difBW41_28subset(pesInd, Treat == 1)$difBW41_28
+## k (# x obs of r largest) = 94, r = 181, m =
+## 115.00000, n = 111.00000, quantile.ub = 0.20264,
+## p-value = 0.3206
+## alternative hypothesis: true e is  0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+
+\clearpage
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Tue Nov 17 13:33:39 2020
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlll}
+  \hline
+ & Tractaments & Quantil 20 & P-value quantileTest \\ 
+  \hline
+1 & 1 & 503 & 0.3206 \\ 
+  2 & 2 & 573.8 &  \\ 
+  3 &  &  &  \\ 
+  4 & 1 & 503 & 0.0033 \\ 
+  5 & 3 & 819 &  \\ 
+  6 &  &  &  \\ 
+  7 & 1 & 503 & 0 \\ 
+  8 & 4 & 883.6 &  \\ 
+  9 &  &  &  \\ 
+  10 & 1 & 503 & 1e-04 \\ 
+  11 & 5 & 865.8 &  \\ 
+  12 &  &  &  \\ 
+  13 & 1 & 503 & 0.0056 \\ 
+  14 & 6 & 745.2 &  \\ 
+  15 &  &  &  \\ 
+  16 & 1 & 503 & 0.2954 \\ 
+  17 & 7 & 609 &  \\ 
+  18 &  &  &  \\ 
+  19 & 1 & 503 & 0.015 \\ 
+  20 & 8 & 766 &  \\ 
+  21 &  &  &  \\ 
+   \hline
+\end{tabular}
+\caption{Taula d'anàlisi de quantiles} 
+\label{tab:tot}
+\end{table}
+   Tractaments Quantil 20 P-value quantileTest
+1            1        503               0.3206
+2            2      573.8                 <NA>
+3                                         <NA>
+4            1        503               0.0033
+5            3        819                 <NA>
+6                                         <NA>
+7            1        503                    0
+8            4      883.6                 <NA>
+9                                         <NA>
+10           1        503                1e-04
+11           5      865.8                 <NA>
+12                                        <NA>
+13           1        503               0.0056
+14           6      745.2                 <NA>
+15                                        <NA>
+16           1        503               0.2954
+17           7        609                 <NA>
+18                                        <NA>
+19           1        503                0.015
+20           8        766                 <NA>
+21                                        <NA>
+   Tractaments Quantil 20 P-value quantileTest
+1            1        503               0.3206
+2            2      573.8                 <NA>
+3                                         <NA>
+4            1        503               0.0033
+5            3        819                 <NA>
+6                                         <NA>
+7            1        503                    0
+8            4      883.6                 <NA>
+9                                         <NA>
+10           1        503                1e-04
+11           5      865.8                 <NA>
+12                                        <NA>
+13           1        503               0.0056
+14           6      745.2                 <NA>
+15                                        <NA>
+16           1        503               0.2954
+17           7        609                 <NA>
+18                                        <NA>
+19           1        503                0.015
+20           8        766                 <NA>
+21                                        <NA>
+
+
+
+
+
+
+\end{document}

@@ -39,21 +39,23 @@ levels(pesInd$Treat)
 
 Creem les següents varibles d'interès.
 
-Guany de pes:
+Guany de pes: 
+$$BW_{41-28} = BW_{41} - BW_{28}$$
 ```{r}
 pesInd$difBW41_28 <- pesInd$BW41-pesInd$BW28
 ```
 
 Index de l'increment de pes:
+$$Index_{41-28} = 100*\cfrac{BW_{41}}{BW_{28}}$$
 ```{r}
 pesInd$indexBW41_28 <- 100*pesInd$BW41/pesInd$BW28                   
 ```
 
 Taxa de l'increment de pes:
+$$Taxa_{41-28} = 100*\cfrac{BW_{41}-BW_{28}}{BW_{28}}$$
 ```{r}
 pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28    
 ```
-
 
 
 ### Tractament de les dades faltants
@@ -190,23 +192,81 @@ _$H_1:$ La porció $\epsilon$ de la distribució per al grup de tractament (la d
 ```{r}
 #help("quantileTest")
 
-quantileTest(
+qtest12 <- quantileTest(
   subset(pesInd,Treat == 2)$difBW41_28,
   subset(pesInd,Treat == 1)$difBW41_28,
   target.quantile = 0.2,
   alternative = "greater")
 
-quantileTest(
+qtest13 <- quantileTest(
   subset(pesInd,Treat == 3)$difBW41_28,
   subset(pesInd,Treat == 1)$difBW41_28,
   target.quantile = 0.2,
   alternative = "greater")
 
-quantileTest(
-  subset(pesInd,Treat == 3)$difBW41_28,
+qtest14 <- quantileTest(
+  subset(pesInd,Treat == 4)$difBW41_28,
   subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.25,
+  target.quantile = 0.2,
   alternative = "greater")
+
+qtest15 <- quantileTest(
+  subset(pesInd,Treat == 5)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest16 <- quantileTest(
+  subset(pesInd,Treat == 6)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest17 <- quantileTest(
+  subset(pesInd,Treat == 7)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+qtest18 <- quantileTest(
+  subset(pesInd,Treat == 8)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+
+quantileTest(
+  subset(pesInd,Treat == 2)$difBW41_28,
+  subset(pesInd,Treat == 1)$difBW41_28,
+  target.quantile = 0.2,
+  alternative = "greater")
+```
+
+
+```{r, 'xtable', results='asis'}
+#library(knitr)
+library(xtable)
+tract <- c(1,2,"",1,3,"",1,4,"",1,5,"",1,6,"",1,7,"",1,8,"")
+quant <- numeric(8)
+for(i in 1:8){
+  quant[i] <- quantile(subset(pesInd,Treat == i)$difBW41_28,0.2,na.rm = T)
+}
+quant <- as.numeric(quant)
+quant1 <- c(quant[c(1,2)],"",quant[c(1,3)],"",quant[c(1,4)],"",quant[c(1,5)],"",quant[c(1,6)],"",quant[c(1,7)],"",quant[c(1,8)],"")
+
+pval <- c(qtest12$p.value,"","",qtest13$p.value,"","",qtest14$p.value,"","",qtest15$p.value,"","",qtest16$p.value,"","",qtest17$p.value,"","",qtest18$p.value,"","")
+
+tottab <- cbind(tract,quant1,pval)
+#colnames(tottab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+
+deftab <- xtable(tottab, digits = c(0,0,3,3),caption="Taula d'anàlisi de quantiles",label="tab:tot")
+
+colnames(deftab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+
+#bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+
+print(deftab,type="html")
+#,size ="\\fontsize{7.5pt}{7pt}\\selectfont",      include.rownames = F,      include.colnames = TRUE,      floating = TRUE,                 # whether \begin{table} should be created (TRUE) or not (FALSE)      sanitize.colnames.function=bold,  
+      # important to treat content of columns as latex function      booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
 
 ```
 
@@ -322,7 +382,9 @@ TukeyHSD(anova)$Treat[c(1:7),]
 Multiple comparisons using multcomp package
 ```{r}
 library(multcomp)
-summary(glht(anova, linfct = mcp(Treat = "Tukey")))
+taula <- summary(glht(anova, linfct = mcp(Treat = "Tukey")))
+class(taula)
+names(taula)
 ```
 
 Pairewise t-test
