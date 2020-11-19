@@ -1,0 +1,359 @@
+\documentclass[11pt,a4paper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage[catalan]{babel}
+\usepackage[left=2.5cm,top=3cm,bottom=3cm,right=2.5cm]{geometry}   % text margins
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{hyperref}                      % link to website: \url{}.
+\usepackage[hang,footnotesize,bf]{caption} % customized caption
+\usepackage{enumitem}
+\usepackage{authblk}
+\usepackage{mathtools}
+\usepackage{booktabs}                      % for booktabs in print(xtable)). 
+\usepackage{marvosym}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\section{Gestió de les dades}
+Llegim les dades \texttt{pesosIndividuales.xlsx}
+
+
+
+
+
+Posem les variables \texttt{Box} i \texttt{Treat} com a factors.
+
+
+
+Creem les següents variables d'interès:
+\begin{itemize}
+\item Guany de pes: 
+$$BW_{41-28} = BW_{41} - BW_{28}$$
+
+\item Index de l'increment de pes:
+$$Index_{41-28} = 100*\cfrac{BW_{41}}{BW_{28}}$$
+
+\item Taxa de l'increment de pes:
+$$Taxa_{41-28} = 100*\cfrac{BW_{41}-BW_{28}}{BW_{28}}$$
+
+\end{itemize}
+
+
+
+\subsection{Tractament de les dades faltants}
+
+\subsubsection{Eliminació de les dades faltants}
+
+Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
+
+
+
+
+\section{Comparació gràfica}
+Usem el package \texttt{patchwork} per a fer layouts de ggplot2.
+
+
+
+Amb les llibraries \texttt{ggplot2, devtools i easyGgplot2} podrem obtenir ggplots d'una manera considerablement senzilla.
+
+
+
+Creem una funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
+Els arguments de la funció són:
+
+\begin{itemize}
+  \item \texttt{BD} la base de dades.
+  
+  \item \texttt{Trac1} i \texttt{Tract2} són els tractaments a comparar.
+  
+  \item \texttt{TipusGraf} si és 1 representem els histogrames solapant-se al mateix eix de les y,
+               si val 2 representarem els histogrames un a sobre de l'altre pero en diferents eix y.
+               
+  \item \texttt{NombreBins} és el nombre de ''caixes'' en que estarà dividit l'histograma de cadascún dels tractaments, el valor predeterminat és 10.
+  
+  \item \texttt{var} és la variable sobre la que es faràn els histogrames.
+\end{itemize}
+
+
+
+\subsection{Histogrames de les noves variables:}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-8-1} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-8-2} 
+
+\end{knitrout}
+
+
+\subsection{Comparació de tots els tractaments amb el control}
+
+
+
+\subsubsection{Variable \texttt{BW41}}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-1} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-2} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-3} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-4} 
+
+\end{knitrout}
+
+
+\subsubsection{Variable \texttt{difBW$41_{28}$}}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-2} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-3} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-4} 
+
+\end{knitrout}
+
+
+\section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
+
+
+
+Test bi-mostral per detectar un canvi positiu en una proporció de la població (tractament) comparada a una altra (control).
+
+\texttt{quantileTest(x, y, alternative = ''greater'', target.quantile = 0.5, target.r = NULL, exact.p = TRUE)}
+    
+\begin{itemize}
+  \item \texttt{x}: Vector numèric d'observacions del grup tractament.
+  
+  \item \texttt{y}: Vector numèric d'observacions del grup control.
+  
+  \item \texttt{alternative}: Tipus d'hipòtesi alternativa.
+
+\begin{itemize}
+      \item ''greater'': La cua dreta del grup tractament desplaçada cap a la dreta de la cua dreta del grup control.
+      
+      \item ''less'': La cua esquerra del grup tractament desplaçada cap a la esquerra de la cua esquerra del grup control.
+\end{itemize}
+
+
+  \item \texttt{target.quantile}: Quantil utilitzat com a punt de tall inferior per a la prova. A causa de la naturalesa discreta dels quantils empírics, el límit superior dels possibles quantils empírics sovint difereix del valor de target.quantile.
+
+\end{itemize}
+
+\textit{$H_1:$ La porció $\epsilon$ de la distribució per al grup de tractament (la distribució de X) es desplaça cap a la dreta de la distribució per al grup de referència (la distribució de Y).}
+
+
+
+\subsection{Resultats del test comparant Tractament vs. control}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## 
+## 	Quantile Test
+## 
+## data:  subset(pesInd, Treat == 2)$difBW41_28subset(pesInd, Treat == 1)$difBW41_28
+## k (# x obs of r largest) = 94, r = 181, m = 115.00000, n =
+## 111.00000, quantile.ub = 0.20264, p-value = 0.3206
+## alternative hypothesis: true e is  0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+   Tractaments Quantil 20 P-value quantileTest
+1            1        503              0.32064
+2            2      573.8                 <NA>
+3                    <NA>                 <NA>
+4            1        503              0.00325
+5            3        819                 <NA>
+6                    <NA>                 <NA>
+7            1        503                4e-05
+8            4      883.6                 <NA>
+9                    <NA>                 <NA>
+10           1        503                9e-05
+11           5      865.8                 <NA>
+12                   <NA>                 <NA>
+13           1        503              0.00555
+14           6      745.2                 <NA>
+15                   <NA>                 <NA>
+16           1        503              0.29542
+17           7        609                 <NA>
+18                   <NA>                 <NA>
+19           1        503              0.01499
+20           8        766                 <NA>
+21                   <NA>                 <NA>
+
+
+
+\section{Costos}
+
+Usarem la variable \texttt{Coste\_per PV} del fitxer \texttt{CalculoIndices.xlsx} modificat.\\
+
+La variable s'ha calculat de la següent forma:\\
+
+Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pes [kg]
+
+
+
+
+Per tal de millorar la normalitat del costos apliquem una transformació de Tukey:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## 
+##     lambda      W Shapiro.p.value
+## 585   -5.4 0.9906          0.8288
+## 
+## if (lambda >  0){TRANS = x ^ lambda} 
+## if (lambda == 0){TRANS = log(x)} 
+## if (lambda <  0){TRANS = -1 * x ^ lambda}
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-1} 
+\begin{kframe}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ggdensity(c5): could not find function "{}ggdensity"{}}}\begin{verbatim}
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  c5
+## W = 0.99055, p-value = 0.8288
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la tranformació aplicada als costos serà $costTuk = -1 * Cost^{\lambda}$
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## tibble [80 x 4] (S3: tbl_df/tbl/data.frame)
+##  $ Cost   : num [1:80] 1.07 1.73 1.16 1.07 1.07 ...
+##  $ Box    : Factor w/ 80 levels "1","2","3","4",..: 1 11 18 26 34 41 50 60 65 75 ...
+##  $ Treat  : Factor w/ 8 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ CostTuk: num [1:80] -0.682 -0.0526 -0.4406 -0.7103 -0.689 ...
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-1} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-2} 
+\begin{kframe}\begin{verbatim}
+##             Df Sum Sq Mean Sq F value   Pr(>F)    
+## Treat        7  3.035  0.4336   4.881 0.000152 ***
+## Residuals   72  6.397  0.0888                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+Tukey multiple pairwise-comparisons
+
+El mètode de Tukey s'utilitza a ANOVA per crear intervals de confiança per a totes les diferències de parelles entre les mitjanes de nivell de factor mentre es controla la taxa d'error familiar fins al nivell que especifiqueu. 
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+##            diff        lwr         upr      p adj
+## 2-1 -0.10534095 -0.5214742  0.31079227 0.99313670
+## 3-1 -0.39553259 -0.8116658  0.02060063 0.07431879
+## 4-1 -0.47522197 -0.8913552 -0.05908875 0.01427889
+## 5-1 -0.37332879 -0.7894620  0.04280442 0.11097158
+## 6-1 -0.03179923 -0.4479324  0.38433399 0.99999757
+## 7-1  0.07552814 -0.3406051  0.49166136 0.99915669
+## 8-1 -0.27980476 -0.6959380  0.13632846 0.42544395
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Pairewise t-test
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## 
+## 	Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  costos$CostTuk and costos$Treat 
+## 
+##   1      2      3      4      5      6      7     
+## 2 0.5691 -      -      -      -      -      -     
+## 3 0.0190 0.0764 -      -      -      -      -     
+## 4 0.0067 0.0246 0.6277 -      -      -      -     
+## 5 0.0246 0.0963 0.8682 0.5691 -      -      -     
+## 6 0.8422 0.6277 0.0248 0.0078 0.0318 -      -     
+## 7 0.6277 0.2949 0.0067 0.0027 0.0078 0.5691 -     
+## 8 0.0847 0.3030 0.5691 0.2572 0.5907 0.1249 0.0265
+## 
+## P value adjustment method: BH
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+
+
+
+
+
+\end{document}

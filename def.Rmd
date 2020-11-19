@@ -21,8 +21,8 @@ knitr::opts_chunk$set(fig.width=8, fig.height=4,                     echo=FALSE,
 Llegim les dades _pesosIndividuales.xlsx_
 ```{r}
 library(readxl)
-#pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
+pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",range = "A1:D949")
+#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",range = "A1:D949")
 ##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
 ```
 
@@ -32,8 +32,8 @@ Posem les variables "Box" i "Treat" com a factors.
 pesInd$Box <- as.factor(pesInd$Box)
 pesInd$Treat <- as.factor(pesInd$Treat)
 
-levels(pesInd$Box)
-levels(pesInd$Treat)
+#levels(pesInd$Box)
+#levels(pesInd$Treat)
 ```
 
 
@@ -242,55 +242,45 @@ quantileTest(
 ```
 
 
-```{r, 'xtable', results='asis'}
-#library(knitr)
+```{r}
 library(xtable)
+```
+
+
+```{r, 'xtable', results='asis',echo=F,eval=T}
 tract <- c(1,2,"",1,3,"",1,4,"",1,5,"",1,6,"",1,7,"",1,8,"")
+
 quant <- numeric(8)
 for(i in 1:8){
   quant[i] <- quantile(subset(pesInd,Treat == i)$difBW41_28,0.2,na.rm = T)
 }
 quant <- as.numeric(quant)
+
 quant1 <- c(quant[c(1,2)],"",quant[c(1,3)],"",quant[c(1,4)],"",quant[c(1,5)],"",quant[c(1,6)],"",quant[c(1,7)],"",quant[c(1,8)],"")
+quant1 <- as.numeric(quant1)
 
 pval <- c(qtest12$p.value,"","",qtest13$p.value,"","",qtest14$p.value,"","",qtest15$p.value,"","",qtest16$p.value,"","",qtest17$p.value,"","",qtest18$p.value,"","")
+pval <- round(as.numeric(pval),5)
 
-tottab <- cbind(tract,quant1,pval)
-#colnames(tottab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+tottab <- as.matrix(cbind(tract,quant1,pval))
 
-deftab <- xtable(tottab, digits = c(0,0,3,3),caption="Taula d'anàlisi de quantiles",label="tab:tot")
 
-colnames(deftab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+colnames(tottab) <- c("Tractaments","Quantil 20","P-value quantileTest")
 
-#bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+deftab <- xtable(tottab,caption="Taula d'anàlisi de quantiles",label="tab:tot")
 
-print(deftab,type="html")
-#,size ="\\fontsize{7.5pt}{7pt}\\selectfont",      include.rownames = F,      include.colnames = TRUE,      floating = TRUE,                 # whether \begin{table} should be created (TRUE) or not (FALSE)      sanitize.colnames.function=bold,  
-      # important to treat content of columns as latex function      booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
 
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+
+
+print(deftab,size ="\\fontsize{12pt}{12pt}\\selectfont",
+      include.rownames = F,
+      include.colnames = TRUE,
+      floating = TRUE,                 # whether \begin{table} should be created (TRUE) or not (FALSE)
+      sanitize.colnames.function=bold,  
+      # important to treat content of columns as latex function
+      booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
 ```
-
-
-## Skewness i Kurtosi
-```{r}
-# library(moments)
-skew <- numeric(length(levels(pesInd$Treat)))
-kurt <- numeric(length(levels(pesInd$Treat)))
-
-for(i in 1:length(levels(pesInd$Treat))){
-  skew[i] <- skewness(subset(pesInd,Treat == i)$taxBW41_28,na.rm = T)
-  
-  kurt[i] <- kurtosis(subset(pesInd,Treat == i)$taxBW41_28,na.rm = T)
-}
-
-as.matrix(skew)
-as.matrix(kurt)
-```
-
-Observem que per la taxa de tots els tractaments existeix una skewness positiva en major o menor mesura, és a dir una cua més llarga a la dreta. Cal destacar que la taxa del tractament 3 podria considerarse pràcticament simètrica.
-
-
-En quant a la curtosi observem que tots els valors són prou propers a 3, de manera que podrien considerarse mesocúrtiques i lleugerament leptocúrtiques (amb pic i cues primes). Destaquen el tractament 4 molt leptoicúrtic i el tractament 7 lleugerament platicúrtic.
 
 
 
@@ -300,7 +290,9 @@ Coste/kg PV (€/kg): La fórmula es: (coste pienso [€/kg] * consumo pienso [k
 
 ```{r}
 library(readxl)
-CalculoIndices <- read_excel("E:/GEA4/PRACTIQUES/CalculoIndices.xlsx",     sheet = "Coste_per PV (2)", range = "A13:Q93")
+#CalculoIndices <- read_excel("E:/GEA4/PRACTIQUES/CalculoIndices.xlsx",sheet = "Coste_per PV (2)", range = "A13:Q93")
+CalculoIndices <- read_excel("G:/GEA4/PRACTIQUES/CalculoIndices.xlsx",sheet = "Coste_per PV (2)", range = "A13:Q93")
+
 names(CalculoIndices)
 
 costos <- CalculoIndices[,"Coste/kg PV (Finisher)"]
@@ -401,19 +393,4 @@ Check the homogeneity of variance assumption
 plot(anova, 1)
 ```
 
-```{r}
-library(car)
-leveneTest(CostTuk ~ Treat, data = costos)
-```
-
-```{r}
-# 2. Normality
-plot(anova, 2)
-shapiro.test(residuals(anova))
-```
-
-Non-parametric alternative to one-way ANOVA test
-```{r}
-kruskal.test(CostTuk ~ Treat, data = costos)
-```
 
