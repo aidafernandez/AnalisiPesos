@@ -130,7 +130,7 @@ histComparatius(pesInd,1,3,1,10,"indexBW41_28") +
 histComparatius(pesInd,1,3,1,10,"taxBW41_28")
 @
 
-
+\clearpage
 \subsection{Comparació de tots els tractaments amb el control}
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 p <- list(numeric(7))
@@ -143,24 +143,24 @@ for(i in 1:7){
 
 
 \subsubsection{Variable \texttt{BW41}}
-<<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
+<<fig.width=6, fig.height=3,echo=FALSE, warning=FALSE, message=FALSE>>=
 p1[[1]] + p1[[2]]
 p1[[3]] + p1[[4]]
 p1[[5]] + p1[[6]]
 p1[[7]] + ggplot()
 @
 
-
+\clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
 
-<<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
+<<fig.width=6, fig.height=3,echo=FALSE, warning=FALSE, message=FALSE>>=
 p[[1]] + p[[2]]
 p[[3]] + p[[4]]
 p[[5]] + p[[6]]
 p[[7]] + ggplot()
 @
 
-
+\clearpage
 \section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
@@ -286,7 +286,7 @@ print(deftab,size ="\\fontsize{12pt}{12pt}\\selectfont",
       booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
 @
 
-
+\clearpage
 \section{Costos}
 
 Usarem la variable \texttt{Coste\_per PV} del fitxer \texttt{CalculoIndices.xlsx} modificat.\\
@@ -311,14 +311,13 @@ pesInd <- merge(pesInd,costos,by=c("Box","Treat"))
 @
 
 
-Per tal de millorar la normalitat del costos apliquem una transformació de Tukey:
+Per tal de millorar la normalitat del costos apliquem una transformació de Tukey de la llibreria \texttt{rcompanion}:
 <<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
 #install.packages("rcompanion")
 library(rcompanion)
 par(mfrow=c(1,3))
 c5 <- transformTukey(costos$Cost, start=-20,end=20)
 ggdensity(c5) + ggqqplot(c5)
-shapiro.test(c5)
 costos$CostTuk <- c5
 @
 
@@ -327,7 +326,6 @@ El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la t
 <<fig.width=8, fig.height=4, echo=FALSE, warning=FALSE, message=FALSE>>=
 #install.packages("ggpubr")
 library(ggpubr)
-str(costos)
 costos$Box <- as.numeric(costos$Box)
 
 ggboxplot(costos, x = "Treat", y = "Cost", color = "Treat",main="Cost") +
@@ -339,21 +337,27 @@ ggline(costos, x = "Treat", y = "Cost",
 ggline(costos, x = "Treat", y = "CostTuk", 
        add = c("mean_se","point"), 
        ylab = "CostTuk", xlab = "Treatment", main = "Cost amb la transformació de Tukey")
+@
 
+Ajustem un model ANOVA i realitzem els següents tests:
+<<echo=FALSE, warning=FALSE, message=FALSE>>=
 anova<-aov(CostTuk~Treat,data=costos)
 summary(anova)
 @
 
 
-Tukey multiple pairwise-comparisons
+\paragraph{Tukey multiple pairwise-comparisons:}
 
-El mètode de Tukey s'utilitza a ANOVA per crear intervals de confiança per a totes les diferències de parelles entre les mitjanes de nivell de factor mentre es controla la taxa d'error familiar fins al nivell que especifiqueu. 
+Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments amb una probabilitat de cobertura especificada familiarment.
+
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 TukeyHSD(anova)$Treat[c(1:7),]
 @
+\clearpage
+\paragraph{Pairewise t-test:}
 
-Pairewise t-test
+Calcula comparacions per parelles entre els diferent tractaments amb correccions per a proves múltiples.
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 pairwise.t.test(costos$CostTuk, costos$Treat,
@@ -364,6 +368,53 @@ pairwise.t.test(costos$CostTuk, costos$Treat,
 
 
 
+\clearpage
+
+%%%%%%%%%%%%%%%
+%%%
+%%% References
+%%%
+%%%%%%%%%%%%%%%
+\begin{thebibliography}{x}
+
+\bibitem{ggplot2}
+\url{https://www.rdocumentation.org/packages/ggplot2/versions/3.3.2}
+
+\bibitem{devtools}
+\url{https://www.rdocumentation.org/packages/devtools/versions/2.3.2}
+
+\bibitem{easyGgplot2}
+\url{https://github.com/kassambara/easyGgplot2}
+
+\bibitem{patchwork}
+\url{https://www.rdocumentation.org/packages/patchwork/versions/1.1.0}
+
+\bibitem{EnvStats}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.4.0}
+
+\bibitem{quantileTest}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}
+
+\bibitem{xtable}
+\url{https://www.rdocumentation.org/packages/xtable/versions/1.8-4}
+
+\bibitem{rcompanion}
+\url{https://www.rdocumentation.org/packages/rcompanion/versions/2.3.26}
+
+\bibitem{ggpubr}
+\url{https://www.rdocumentation.org/packages/ggpubr/versions/0.4.0}
+
+\bibitem{aov}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/aov}
+
+\bibitem{TukeyHSD}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/TukeyHSD}
+
+\bibitem{pairwise.t.test}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/pairwise.t.test}
+
+
+\end{thebibliography}
 
 
 

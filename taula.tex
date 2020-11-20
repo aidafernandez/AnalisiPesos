@@ -137,7 +137,7 @@ Els arguments de la funció són:
 
 \end{knitrout}
 
-
+\clearpage
 \subsection{Comparació de tots els tractaments amb el control}
 
 
@@ -155,7 +155,7 @@ Els arguments de la funció són:
 
 \end{knitrout}
 
-
+\clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
 
 \begin{knitrout}
@@ -170,7 +170,7 @@ Els arguments de la funció són:
 
 \end{knitrout}
 
-
+\clearpage
 \section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
 
 
@@ -209,8 +209,9 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 ## 	Quantile Test
 ## 
 ## data:  subset(pesInd, Treat == 2)$difBW41_28subset(pesInd, Treat == 1)$difBW41_28
-## k (# x obs of r largest) = 94, r = 181, m = 115.00000, n =
-## 111.00000, quantile.ub = 0.20264, p-value = 0.3206
+## k (# x obs of r largest) = 94, r = 181, m =
+## 115.00000, n = 111.00000, quantile.ub = 0.20264,
+## p-value = 0.3206
 ## alternative hypothesis: true e is  0
 \end{verbatim}
 \end{kframe}
@@ -218,31 +219,45 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 
 
-   Tractaments Quantil 20 P-value quantileTest
-1            1        503              0.32064
-2            2      573.8                 <NA>
-3                    <NA>                 <NA>
-4            1        503              0.00325
-5            3        819                 <NA>
-6                    <NA>                 <NA>
-7            1        503                4e-05
-8            4      883.6                 <NA>
-9                    <NA>                 <NA>
-10           1        503                9e-05
-11           5      865.8                 <NA>
-12                   <NA>                 <NA>
-13           1        503              0.00555
-14           6      745.2                 <NA>
-15                   <NA>                 <NA>
-16           1        503              0.29542
-17           7        609                 <NA>
-18                   <NA>                 <NA>
-19           1        503              0.01499
-20           8        766                 <NA>
-21                   <NA>                 <NA>
+% latex table generated in R 3.6.3 by xtable 1.8-4 package
+% Fri Nov 20 13:56:10 2020
+\begin{table}[ht]
+\centering
+\begingroup\fontsize{12pt}{12pt}\selectfont
+\begin{tabular}{lll}
+  \toprule
+{\textbf{Tractaments}} & {\textbf{Quantil 20}} & {\textbf{P-value quantileTest}} \\ 
+  \midrule
+1 & 503 & 0.32064 \\ 
+  2 & 573.8 &  \\ 
+   &  &  \\ 
+  1 & 503 & 0.00325 \\ 
+  3 & 819 &  \\ 
+   &  &  \\ 
+  1 & 503 & 4e-05 \\ 
+  4 & 883.6 &  \\ 
+   &  &  \\ 
+  1 & 503 & 9e-05 \\ 
+  5 & 865.8 &  \\ 
+   &  &  \\ 
+  1 & 503 & 0.00555 \\ 
+  6 & 745.2 &  \\ 
+   &  &  \\ 
+  1 & 503 & 0.29542 \\ 
+  7 & 609 &  \\ 
+   &  &  \\ 
+  1 & 503 & 0.01499 \\ 
+  8 & 766 &  \\ 
+   &  &  \\ 
+   \bottomrule
+\end{tabular}
+\endgroup
+\caption{Taula d'anàlisi de quantiles} 
+\label{tab:tot}
+\end{table}
 
 
-
+\clearpage
 \section{Costos}
 
 Usarem la variable \texttt{Coste\_per PV} del fitxer \texttt{CalculoIndices.xlsx} modificat.\\
@@ -254,7 +269,7 @@ Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pe
 
 
 
-Per tal de millorar la normalitat del costos apliquem una transformació de Tukey:
+Per tal de millorar la normalitat del costos apliquem una transformació de Tukey de la llibreria \texttt{rcompanion}:
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
@@ -268,47 +283,40 @@ Per tal de millorar la normalitat del costos apliquem una transformació de Tuke
 \end{verbatim}
 \end{kframe}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-1} 
-\begin{kframe}
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ggdensity(c5): could not find function "{}ggdensity"{}}}\begin{verbatim}
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  c5
-## W = 0.99055, p-value = 0.8288
-\end{verbatim}
-\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-2} 
+
 \end{knitrout}
 
 El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la tranformació aplicada als costos serà $costTuk = -1 * Cost^{\lambda}$
 
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## tibble [80 x 4] (S3: tbl_df/tbl/data.frame)
-##  $ Cost   : num [1:80] 1.07 1.73 1.16 1.07 1.07 ...
-##  $ Box    : Factor w/ 80 levels "1","2","3","4",..: 1 11 18 26 34 41 50 60 65 75 ...
-##  $ Treat  : Factor w/ 8 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ CostTuk: num [1:80] -0.682 -0.0526 -0.4406 -0.7103 -0.689 ...
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-1} 
 
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-2} 
-\begin{kframe}\begin{verbatim}
+
+\end{knitrout}
+
+Ajustem un model ANOVA i realitzem els següents tests:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ##             Df Sum Sq Mean Sq F value   Pr(>F)    
 ## Treat        7  3.035  0.4336   4.881 0.000152 ***
 ## Residuals   72  6.397  0.0888                     
 ## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
 
-Tukey multiple pairwise-comparisons
+\paragraph{Tukey multiple pairwise-comparisons:}
 
-El mètode de Tukey s'utilitza a ANOVA per crear intervals de confiança per a totes les diferències de parelles entre les mitjanes de nivell de factor mentre es controla la taxa d'error familiar fins al nivell que especifiqueu. 
+Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments amb una probabilitat de cobertura especificada familiarment.
+
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -324,8 +332,10 @@ El mètode de Tukey s'utilitza a ANOVA per crear intervals de confiança per a t
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+\clearpage
+\paragraph{Pairewise t-test:}
 
-Pairewise t-test
+Calcula comparacions per parelles entre els diferent tractaments amb correccions per a proves múltiples.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -353,6 +363,53 @@ Pairewise t-test
 
 
 
+\clearpage
+
+%%%%%%%%%%%%%%%
+%%%
+%%% References
+%%%
+%%%%%%%%%%%%%%%
+\begin{thebibliography}{x}
+
+\bibitem{ggplot2}
+\url{https://www.rdocumentation.org/packages/ggplot2/versions/3.3.2}
+
+\bibitem{devtools}
+\url{https://www.rdocumentation.org/packages/devtools/versions/2.3.2}
+
+\bibitem{easyGgplot2}
+\url{https://github.com/kassambara/easyGgplot2}
+
+\bibitem{patchwork}
+\url{https://www.rdocumentation.org/packages/patchwork/versions/1.1.0}
+
+\bibitem{EnvStats}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.4.0}
+
+\bibitem{quantileTest}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}
+
+\bibitem{xtable}
+\url{https://www.rdocumentation.org/packages/xtable/versions/1.8-4}
+
+\bibitem{rcompanion}
+\url{https://www.rdocumentation.org/packages/rcompanion/versions/2.3.26}
+
+\bibitem{ggpubr}
+\url{https://www.rdocumentation.org/packages/ggpubr/versions/0.4.0}
+
+\bibitem{aov}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/aov}
+
+\bibitem{TukeyHSD}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/TukeyHSD}
+
+\bibitem{pairwise.t.test}
+\url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/pairwise.t.test}
+
+
+\end{thebibliography}
 
 
 
