@@ -1,11 +1,7 @@
 library(readxl)
 # https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest
 
-
-
 pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-#pesInd <- read_excel("E://GEA4//PRACTIQUES//pesosIndividuales.xlsx",                      range = "A1:D949")
-##pesInd <- read_excel("C:/Users//farre//PINSO//Nedra_pesades//fitxersEnviats_Nedra_2oct2020//pesosIndividuales.xlsx",range = "A1:D949")
 
 pesInd$Box <- as.factor(pesInd$Box)
 pesInd$Treat <- as.factor(pesInd$Treat)

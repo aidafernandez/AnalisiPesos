@@ -1,0 +1,14 @@
+---
+title: "Quantile Test Exemple"
+author: "Aida Fernandez, 1497182"
+fontsize: 10pt
+documentclass: article
+output:
+  html_document:
+    df_print: paged
+    number_sections: false
+  pdf_document: 
+    keep_tex: true
+---
+
+

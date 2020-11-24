@@ -85,7 +85,10 @@ library(devtools)
 library(easyGgplot2)
 @
 
-Creem una funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
+Creem una funció per a simplificar l'obtenció dels histogrames per a comparar tractaments:\\
+
+\texttt{histComparatius(BD,Tract1,Tract2,TipusGraf=c(1,2),NombreBins,var)}
+
 Els arguments de la funció són:
 
 \begin{itemize}
@@ -143,22 +146,33 @@ for(i in 1:7){
 
 
 \subsubsection{Variable \texttt{BW41}}
-<<fig.width=6, fig.height=3,echo=FALSE, warning=FALSE, message=FALSE>>=
+<<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
 p1[[1]] + p1[[2]]
 p1[[3]] + p1[[4]]
 p1[[5]] + p1[[6]]
-p1[[7]] + ggplot()
 @
+
+\begin{center}
+<<fig.width=3.5, fig.height=3.5,echo=FALSE, warning=FALSE, message=FALSE>>=
+p1[[7]]
+@
+\end{center}
 
 \clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
 
-<<fig.width=6, fig.height=3,echo=FALSE, warning=FALSE, message=FALSE>>=
+<<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
 p[[1]] + p[[2]]
 p[[3]] + p[[4]]
 p[[5]] + p[[6]]
-p[[7]] + ggplot()
 @
+
+\begin{center}
+<<fig.width=3.5, fig.height=3.5,echo=FALSE, warning=FALSE, message=FALSE>>=
+p[[7]]
+@
+\end{center}
+
 
 \clearpage
 \section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
@@ -194,6 +208,10 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 
 \subsection{Resultats del test comparant Tractament vs. control}
+
+Apliquem el test al quantil 0.2, de manera que un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
+
+Veiem un exemple de la sortida de RStudio i una taula resumint els resultats per a a tots els tractaments respecte el control.
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 library(EnvStats)
 #help("quantileTest")

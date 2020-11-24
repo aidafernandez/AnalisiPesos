@@ -109,7 +109,10 @@ Amb les llibraries \texttt{ggplot2, devtools i easyGgplot2} podrem obtenir ggplo
 
 
 
-Creem una funció per a simplificar l'obtenció dels histogrames per a comparar tractaments.
+Creem una funció per a simplificar l'obtenció dels histogrames per a comparar tractaments:\\
+
+\texttt{histComparatius(BD,Tract1,Tract2,TipusGraf=c(1,2),NombreBins,var)}
+
 Els arguments de la funció són:
 
 \begin{itemize}
@@ -151,24 +154,37 @@ Els arguments de la funció són:
 
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-3} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-4} 
+\end{knitrout}
+
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
 
 \end{knitrout}
+\end{center}
 
 \clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-2} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-3} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-4} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-3} 
 
 \end{knitrout}
+
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-1} 
+
+\end{knitrout}
+\end{center}
+
 
 \clearpage
 \section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
@@ -202,6 +218,10 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 
 \subsection{Resultats del test comparant Tractament vs. control}
+
+Apliquem el test al quantil 0.2, de manera que un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
+
+Veiem un exemple de la sortida de RStudio i una taula resumint els resultats per a a tots els tractaments respecte el control.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
@@ -209,8 +229,7 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 ## 	Quantile Test
 ## 
 ## data:  subset(pesInd, Treat == 2)$difBW41_28subset(pesInd, Treat == 1)$difBW41_28
-## k (# x obs of r largest) = 94, r = 181, m =
-## 115.00000, n = 111.00000, quantile.ub = 0.20264,
+## k (# x obs of r largest) = 94, r = 181, m = 115.00000, n = 111.00000, quantile.ub = 0.20264,
 ## p-value = 0.3206
 ## alternative hypothesis: true e is  0
 \end{verbatim}
@@ -220,7 +239,7 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 
 % latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Fri Nov 20 13:56:10 2020
+% Tue Nov 24 14:03:59 2020
 \begin{table}[ht]
 \centering
 \begingroup\fontsize{12pt}{12pt}\selectfont
@@ -282,9 +301,9 @@ Per tal de millorar la normalitat del costos apliquem una transformació de Tuke
 ## if (lambda <  0){TRANS = -1 * x ^ lambda}
 \end{verbatim}
 \end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-1} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-19-1} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-17-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-19-2} 
 
 \end{knitrout}
 
@@ -292,9 +311,9 @@ El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la t
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-1} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-1} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-18-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-2} 
 
 \end{knitrout}
 
@@ -306,8 +325,7 @@ Ajustem un model ANOVA i realitzem els següents tests:
 ## Treat        7  3.035  0.4336   4.881 0.000152 ***
 ## Residuals   72  6.397  0.0888                     
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
