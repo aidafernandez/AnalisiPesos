@@ -12,12 +12,12 @@
 \usepackage{mathtools}
 \usepackage{booktabs}                      % for booktabs in print(xtable)). 
 \usepackage{marvosym}
-
+\usepackage{lscape}
 
 \begin{document}
 
 \section{Gestió de les dades}
-Llegim les dades \texttt{pesosIndividuales.xlsx}
+Llegim les dades \texttt{pesosIndividuales.xlsx}\\
 
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
@@ -27,7 +27,18 @@ pesInd <- read_excel("G://GEA4//PRACTIQUES//pesosIndividuales.xlsx",            
 @
 
 
-Posem les variables \texttt{Box} i \texttt{Treat} com a factors.
+\subsection{Tractament de les dades faltants}
+
+Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
+
+<<echo=FALSE, warning=FALSE, message=FALSE>>=
+pesInd <- na.omit(pesInd)
+@
+
+
+\subsection{Tractament de les variables}
+
+Posem les variables \texttt{Box} i \texttt{Treat} com a factors.\\
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 pesInd$Box <- as.factor(pesInd$Box)
@@ -37,7 +48,7 @@ pesInd$Treat <- as.factor(pesInd$Treat)
 #levels(pesInd$Treat)
 @
 
-Creem les següents variables d'interès:
+Creem les següents variables d'interès amb l'objectiu de controlar l'efecte individual i el pes al naixement:
 \begin{itemize}
 \item Guany de pes: 
 $$BW_{41-28} = BW_{41} - BW_{28}$$
@@ -47,6 +58,9 @@ $$Index_{41-28} = 100*\cfrac{BW_{41}}{BW_{28}}$$
 
 \item Taxa de l'increment de pes:
 $$Taxa_{41-28} = 100*\cfrac{BW_{41}-BW_{28}}{BW_{28}}$$
+\vspace{0.5cm}
+
+Caldrà tenir en compte que els valors petits d'aquestes variables poden provindre d'individus amb pesos inicialment grans (o també petits).
 
 \end{itemize}
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
@@ -55,16 +69,13 @@ pesInd$indexBW41_28 <- 100*pesInd$BW41/pesInd$BW28
 pesInd$taxBW41_28 <- 100*(pesInd$BW41-pesInd$BW28)/pesInd$BW28    
 @
 
-
-\subsection{Tractament de les dades faltants}
-
-\subsubsection{Eliminació de les dades faltants}
-
-Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
-
-<<echo=FALSE, warning=FALSE, message=FALSE>>=
-pesIndOmitNA <- na.omit(pesInd)
+Creem una base de dades sense aquells individus amb increments de pes negatius.
+<<>>=
+pesIndDifNoNegativa <- pesInd[-pesInd$difBW41_28<0,]
 @
+
+
+
 
 
 \section{Comparació gràfica}
@@ -106,8 +117,8 @@ Els arguments de la funció són:
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,var="BW41"){
-  t1vst2 <- subset(BD,Treat == c(Tract1,Tract2))
-  
+  t1vst2 <- subset(BD,Treat %in% c(Tract1,Tract2))   ## modificació !!!
+ 
   if(TipusGraf==1){
   ggplot2.histogram(data=t1vst2, xName=var,
     groupName='Treat', legendPosition="top",
@@ -127,7 +138,7 @@ histComparatius <- function(BD, Tract1, Tract2,TipusGraf=c(1,2),NombreBins=10,va
 
 <<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
 histComparatius(pesInd,1,3,1,10,"BW41")+
-histComparatius(pesInd,1,3,1,10,"difBW41_28")
+histComparatius(pesIndDifNoNegativa,1,3,1,10,"difBW41_28")
 
 histComparatius(pesInd,1,3,1,10,"indexBW41_28") +
 histComparatius(pesInd,1,3,1,10,"taxBW41_28")
@@ -139,7 +150,7 @@ histComparatius(pesInd,1,3,1,10,"taxBW41_28")
 p <- list(numeric(7))
 p1 <- list(numeric(7))
 for(i in 1:7){
-  p[[i]] <- histComparatius(pesInd,1,i+1,1,10,"difBW41_28")
+  p[[i]] <- histComparatius(pesIndDifNoNegativa,1,i+1,1,10,"difBW41_28")
   p1[[i]] <- histComparatius(pesInd,1,i+1,1,10,"BW41")
 }
 @
@@ -152,11 +163,10 @@ p1[[3]] + p1[[4]]
 p1[[5]] + p1[[6]]
 @
 
-\begin{center}
 <<fig.width=3.5, fig.height=3.5,echo=FALSE, warning=FALSE, message=FALSE>>=
 p1[[7]]
 @
-\end{center}
+
 
 \clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
@@ -167,15 +177,14 @@ p[[3]] + p[[4]]
 p[[5]] + p[[6]]
 @
 
-\begin{center}
 <<fig.width=3.5, fig.height=3.5,echo=FALSE, warning=FALSE, message=FALSE>>=
 p[[7]]
 @
-\end{center}
+
 
 
 \clearpage
-\section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
+\section{Two-Sample Rank Test to detect a shift in a proportion of the ''treated'' population}
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 library(EnvStats)
@@ -209,87 +218,54 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 \subsection{Resultats del test comparant Tractament vs. control}
 
-Apliquem el test al quantil 0.2, de manera que un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
+Apliquem el test al quantil 0.2, 0.3, 0.4 i 0.75. De manera que per exemple per al quantil 0.2 un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
 
 Veiem un exemple de la sortida de RStudio i una taula resumint els resultats per a a tots els tractaments respecte el control.
+
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 library(EnvStats)
-#help("quantileTest")
-
-qtest12 <- quantileTest(
-  subset(pesInd,Treat == 2)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest13 <- quantileTest(
-  subset(pesInd,Treat == 3)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest14 <- quantileTest(
-  subset(pesInd,Treat == 4)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest15 <- quantileTest(
-  subset(pesInd,Treat == 5)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest16 <- quantileTest(
-  subset(pesInd,Treat == 6)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest17 <- quantileTest(
-  subset(pesInd,Treat == 7)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-qtest18 <- quantileTest(
-  subset(pesInd,Treat == 8)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
-
-quantileTest(
-  subset(pesInd,Treat == 2)$difBW41_28,
-  subset(pesInd,Treat == 1)$difBW41_28,
-  target.quantile = 0.2,
-  alternative = "greater")
 @
 
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 library(xtable)
 @
 
+\clearpage
+
 <<results = 'asis',echo=F>>=
 tract <- c(1,2,"",1,3,"",1,4,"",1,5,"",1,6,"",1,7,"",1,8,"")
 
-quant <- numeric(8)
-for(i in 1:8){
-  quant[i] <- quantile(subset(pesInd,Treat == i)$difBW41_28,0.2,na.rm = T)
-}
-quant <- as.numeric(quant)
+quantt <- function(quantil){
+  quant <- numeric(8)
+    for(i in 1:8){
+      quant[i] <- quantile(subset(pesInd,Treat == i)$difBW41_28,quantil,na.rm = T)
+    }
+  quant <- as.numeric(quant)
 
-quant1 <- c(quant[c(1,2)],"",quant[c(1,3)],"",quant[c(1,4)],"",quant[c(1,5)],"",quant[c(1,6)],"",quant[c(1,7)],"",quant[c(1,8)],"")
+  quant1 <- c(quant[c(1,2)],"",quant[c(1,3)],"",quant[c(1,4)],"",quant[c(1,5)],"",quant[c(1,6)],"",quant[c(1,7)],"",quant[c(1,8)],"")
 quant1 <- as.numeric(quant1)
 
-pval <- c(qtest12$p.value,"","",qtest13$p.value,"","",qtest14$p.value,"","",qtest15$p.value,"","",qtest16$p.value,"","",qtest17$p.value,"","",qtest18$p.value,"","")
-pval <- round(as.numeric(pval),5)
+  qtest <- list()
+  for(i in 1:7){
+    qtest[[i]] <- quantileTest(
+      subset(pesInd,Treat == i+1)$difBW41_28,
+      subset(pesInd,Treat == 1)$difBW41_28,
+      target.quantile = quantil,
+      alternative = "greater")
+  }
 
-tottab <- as.matrix(cbind(tract,quant1,pval))
+  pval <- c(qtest[[1]]$p.value,"","",qtest[[2]]$p.value,"","",qtest[[3]]$p.value,"","",qtest[[4]]$p.value,"","",qtest[[5]]$p.value,"","",qtest[[6]]$p.value,"","",qtest[[7]]$p.value,"","")
+  pval <- round(as.numeric(pval),5)
+  
+  return(cbind(quant1,pval))
+}
+
+tottab <- as.matrix(cbind(tract,quantt(0.20),quantt(0.30),quantt(0.40),quantt(0.75)))
 
 
-colnames(tottab) <- c("Tractaments","Quantil 20","P-value quantileTest")
+colnames(tottab) <- c("Treat","$q_{20}$","P-value","$q_{30}$","P-value","$q_{40}$","P-value","$q_{75}$","P-value")
 
-deftab <- xtable(tottab,caption="Taula d'anàlisi de quantiles",label="tab:tot")
+deftab <- xtable(tottab,caption="Taula d'anàlisi de quantiles per a la variable guany de pes $BW41_{28}$",label="tab:tot")
 
 
 bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
@@ -304,15 +280,16 @@ print(deftab,size ="\\fontsize{12pt}{12pt}\\selectfont",
       booktabs = TRUE)                 # requires \usepackage{booktabs} in the preamble of the document)
 @
 
+
 \clearpage
 \section{Costos}
 
 Usarem la variable \texttt{Coste\_per PV} del fitxer \texttt{CalculoIndices.xlsx} modificat.\\
 
-La variable s'ha calculat de la següent forma:\\
-
-Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pes [kg]
-
+La variable s'ha calculat de la següent forma:
+$$
+\mbox{\text{Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pes [kg]}}
+$$
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 library(readxl)
 
@@ -328,62 +305,89 @@ colnames(costos) <- c("Cost","Box","Treat")
 pesInd <- merge(pesInd,costos,by=c("Box","Treat"))
 @
 
-
-Per tal de millorar la normalitat del costos apliquem una transformació de Tukey de la llibreria \texttt{rcompanion}:
-<<fig.width=8, fig.height=4,echo=FALSE, warning=FALSE, message=FALSE>>=
-#install.packages("rcompanion")
-library(rcompanion)
-par(mfrow=c(1,3))
-c5 <- transformTukey(costos$Cost, start=-20,end=20)
-ggdensity(c5) + ggqqplot(c5)
-costos$CostTuk <- c5
-@
-
-El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la tranformació aplicada als costos serà $costTuk = -1 * Cost^{\lambda}$
-
+\vspace{0.5cm}
+\subsection{Exploració de la variable Cost}
 <<fig.width=8, fig.height=4, echo=FALSE, warning=FALSE, message=FALSE>>=
 #install.packages("ggpubr")
 library(ggpubr)
 costos$Box <- as.numeric(costos$Box)
 
 ggboxplot(costos, x = "Treat", y = "Cost", color = "Treat",main="Cost") +
-ggboxplot(costos, x = "Treat", y = "CostTuk", color = "Treat",main="Cost amb la transformació de Tukey")
-
 ggline(costos, x = "Treat", y = "Cost", 
        add = c("mean_se","point"), 
-       ylab = "Cost", xlab = "Treatment", main = "Cost") +
+       ylab = "Cost", xlab = "Treatment", main = "Cost")
+@
+
+Per tal de millorar la normalitat del costos apliquem una transformació de Tukey de la llibreria \texttt{rcompanion}:
+
+{\footnotesize
+<<fig.width=8, fig.height=3,echo=FALSE, warning=FALSE, message=FALSE>>=
+#install.packages("rcompanion")
+library(rcompanion)
+par(mfrow=c(1,3))
+c5 <- transformTukey(costos$Cost, start=-20,end=20)
+#ggdensity(c5) + ggqqplot(c5)
+costos$CostTuk <- c5
+@
+}
+
+El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la tranformació aplicada als costos serà $costTuk = -1 * Cost^{\lambda}$
+\vspace{0.5cm}
+
+<<fig.width=8, fig.height=4, echo=FALSE, warning=FALSE, message=FALSE>>=
+#install.packages("ggpubr")
+library(ggpubr)
+costos$Box <- as.numeric(costos$Box)
+
+ggboxplot(costos, x = "Treat", y = "CostTuk", color = "Treat",main="Cost amb la transformació de Tukey")+
 ggline(costos, x = "Treat", y = "CostTuk", 
        add = c("mean_se","point"), 
        ylab = "CostTuk", xlab = "Treatment", main = "Cost amb la transformació de Tukey")
 @
 
-Ajustem un model ANOVA i realitzem els següents tests:
+\subsection{Anàlisi dels resultats}
+Amb les dades normalitzades ajustem un model ANOVA i realitzem els següents tests:
+
+{\footnotesize
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 anova<-aov(CostTuk~Treat,data=costos)
 summary(anova)
 @
-
+}
 
 \paragraph{Tukey multiple pairwise-comparisons:}
 
-Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments amb una probabilitat de cobertura especificada familiarment.
+Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments.
 
-
+{\footnotesize
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 TukeyHSD(anova)$Treat[c(1:7),]
 @
+}
+
+
+Si observem el p-valor ajustat per comparacions múltiples observem que els tractments més significatius respecte del control són els tractaments 4,3 i 5, en ordre de significació.
+
+\vspace{0.5cm}
 \clearpage
-\paragraph{Pairewise t-test:}
+\paragraph{Pairwise t-test:}
 
-Calcula comparacions per parelles entre els diferent tractaments amb correccions per a proves múltiples.
+Calcula comparacions per parelles entre els diferents tractaments, primer sense i després amb correccions per a proves múltiples. La primera taula conté el p-value usuals del t-test i la de sota conté el p-value ajustat pel mètode de Benjamin  \& Hockberg (BH), un p-valor que ens indica els False Discovery Rate (FDR). Se solen considerar significatives totes les diferències amb un  adj-p-values menor que 0.1.
 
+{\footnotesize
 <<echo=FALSE, warning=FALSE, message=FALSE>>=
 pairwise.t.test(costos$CostTuk, costos$Treat,
+                 p.adjust.method = "none")
+pairwise.t.test(costos$CostTuk, costos$Treat,
                  p.adjust.method = "BH")
-@
+ @
+}
 
+Observem les comparacions per parelles de tractaments sense cap tipus de correcció (p-valors més petits) i amb la correcció de Benjamin \& Hochberg que controla el rati de falsos positius a l'hora de fer múltiples comparacions.\\
 
+Cal destacar que les diferències en els p-valors per a les comparacions dos a dos es deuen a que el t.test i les comparacions de Tukey utilitzen metodologies diferents per a obtenir el p-valor.\\
 
+Els resultats de la correcció de Tukey i de BH no coincideixen perquè la correcció de Tukey és més conservadora. Ens inclinem per presentar aquesta segona opció: p-value sense ajustar i ajustat per BH.
 
 
 \clearpage
@@ -411,7 +415,8 @@ pairwise.t.test(costos$CostTuk, costos$Treat,
 \url{https://www.rdocumentation.org/packages/EnvStats/versions/2.4.0}
 
 \bibitem{quantileTest}
-\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}\\
+\url{https://www.jstor.org/stable/2532001?seq=1&cid=pdf-reference}
 
 \bibitem{xtable}
 \url{https://www.rdocumentation.org/packages/xtable/versions/1.8-4}
@@ -430,6 +435,9 @@ pairwise.t.test(costos$CostTuk, costos$Treat,
 
 \bibitem{pairwise.t.test}
 \url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/pairwise.t.test}
+
+\bibitem{levene.test}
+\url{https://www.rdocumentation.org/packages/lawstat/versions/3.2/topics/levene.test}
 
 
 \end{thebibliography}

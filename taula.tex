@@ -62,21 +62,31 @@
 \usepackage{mathtools}
 \usepackage{booktabs}                      % for booktabs in print(xtable)). 
 \usepackage{marvosym}
+\usepackage{lscape}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
 \section{Gestió de les dades}
-Llegim les dades \texttt{pesosIndividuales.xlsx}
+Llegim les dades \texttt{pesosIndividuales.xlsx}\\
 
 
 
 
 
-Posem les variables \texttt{Box} i \texttt{Treat} com a factors.
+\subsection{Tractament de les dades faltants}
+
+Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
 
 
 
-Creem les següents variables d'interès:
+
+\subsection{Tractament de les variables}
+
+Posem les variables \texttt{Box} i \texttt{Treat} com a factors.\\
+
+
+
+Creem les següents variables d'interès amb l'objectiu de controlar l'efecte individual i el pes al naixement:
 \begin{itemize}
 \item Guany de pes: 
 $$BW_{41-28} = BW_{41} - BW_{28}$$
@@ -86,16 +96,22 @@ $$Index_{41-28} = 100*\cfrac{BW_{41}}{BW_{28}}$$
 
 \item Taxa de l'increment de pes:
 $$Taxa_{41-28} = 100*\cfrac{BW_{41}-BW_{28}}{BW_{28}}$$
+\vspace{0.5cm}
+
+Caldrà tenir en compte que els valors petits d'aquestes variables poden provindre d'individus amb pesos inicialment grans (o també petits).
 
 \end{itemize}
 
 
+Creem una base de dades sense aquells individus amb increments de pes negatius.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{pesIndDifNoNegativa} \hlkwb{<-} \hlstd{pesInd[}\hlopt{-}\hlstd{pesInd}\hlopt{$}\hlstd{difBW41_28}\hlopt{<}\hlnum{0}\hlstd{,]}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 
-\subsection{Tractament de les dades faltants}
-
-\subsubsection{Eliminació de les dades faltants}
-
-Si concluim en que la distribució de les dades faltants es pot considerar aleatòria i que n'hi ha poques podem omitir aquestes dades i treure-les de la base de dades sabent que no esbiaixaràn l'anàlisi. Encara que cal tenir en compte que hi haurà una petita pèrdua d'informació.
 
 
 
@@ -134,9 +150,9 @@ Els arguments de la funció són:
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-8-1} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-9-1} 
 
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-8-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-9-2} 
 
 \end{knitrout}
 
@@ -148,46 +164,44 @@ Els arguments de la funció són:
 \subsubsection{Variable \texttt{BW41}}
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-1} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-2} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10-3} 
-
-\end{knitrout}
-
-\begin{center}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-2} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-3} 
+
 \end{knitrout}
-\end{center}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
+
+\end{knitrout}
+
 
 \clearpage
 \subsubsection{Variable \texttt{difBW$41_{28}$}}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-2} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-3} 
-
-\end{knitrout}
-
-\begin{center}
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-1} 
 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-2} 
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-3} 
+
 \end{knitrout}
-\end{center}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-14-1} 
+
+\end{knitrout}
+
 
 
 \clearpage
-\section{Two-Sample Rank Test To Detect A Shift In A Proportion Of The ''Treated'' Population}
+\section{Two-Sample Rank Test to detect a shift in a proportion of the ''treated'' population}
 
 
 
@@ -219,61 +233,53 @@ Test bi-mostral per detectar un canvi positiu en una proporció de la població 
 
 \subsection{Resultats del test comparant Tractament vs. control}
 
-Apliquem el test al quantil 0.2, de manera que un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
+Apliquem el test al quantil 0.2, 0.3, 0.4 i 0.75. De manera que per exemple per al quantil 0.2 un 20\% de la població és menor o igual al valor del quantil. I a la variable diferència dels pesos individuals a la setmana 28 i a la setmana 41.\\
 
 Veiem un exemple de la sortida de RStudio i una taula resumint els resultats per a a tots els tractaments respecte el control.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## 
-## 	Quantile Test
-## 
-## data:  subset(pesInd, Treat == 2)$difBW41_28subset(pesInd, Treat == 1)$difBW41_28
-## k (# x obs of r largest) = 94, r = 181, m = 115.00000, n = 111.00000, quantile.ub = 0.20264,
-## p-value = 0.3206
-## alternative hypothesis: true e is  0
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
 
+
+
+
+\clearpage
 
 % latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Tue Nov 24 14:03:59 2020
+% Tue Dec 29 16:33:35 2020
 \begin{table}[ht]
 \centering
 \begingroup\fontsize{12pt}{12pt}\selectfont
-\begin{tabular}{lll}
+\begin{tabular}{lllllllll}
   \toprule
-{\textbf{Tractaments}} & {\textbf{Quantil 20}} & {\textbf{P-value quantileTest}} \\ 
+{\textbf{Treat}} & {\textbf{$q_{20}$}} & {\textbf{P-value}} & {\textbf{$q_{30}$}} & {\textbf{P-value}} & {\textbf{$q_{40}$}} & {\textbf{P-value}} & {\textbf{$q_{75}$}} & {\textbf{P-value}} \\ 
   \midrule
-1 & 503 & 0.32064 \\ 
-  2 & 573.8 &  \\ 
-   &  &  \\ 
-  1 & 503 & 0.00325 \\ 
-  3 & 819 &  \\ 
-   &  &  \\ 
-  1 & 503 & 4e-05 \\ 
-  4 & 883.6 &  \\ 
-   &  &  \\ 
-  1 & 503 & 9e-05 \\ 
-  5 & 865.8 &  \\ 
-   &  &  \\ 
-  1 & 503 & 0.00555 \\ 
-  6 & 745.2 &  \\ 
-   &  &  \\ 
-  1 & 503 & 0.29542 \\ 
-  7 & 609 &  \\ 
-   &  &  \\ 
-  1 & 503 & 0.01499 \\ 
-  8 & 766 &  \\ 
-   &  &  \\ 
+1 & 503 & 0.32064 & 667 & 0.32084 & 772 & 0.26627 & 1221 & 0.26858 \\ 
+  2 & 573.8 &  & 693.8 &  & 820.8 &  & 1266.5 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 0.00325 & 667 & 8e-05 & 772 & 0.00064 & 1221 & 0.05803 \\ 
+  3 & 819 &  & 936.2 &  & 1060.6 &  & 1381.5 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 4e-05 & 667 & 0 & 772 & 2e-05 & 1221 & 0.00217 \\ 
+  4 & 883.6 &  & 1011.6 &  & 1125.4 &  & 1435 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 9e-05 & 667 & 2e-05 & 772 & 3e-05 & 1221 & 0.03003 \\ 
+  5 & 865.8 &  & 987.2 &  & 1132 &  & 1419.75 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 0.00555 & 667 & 0.00318 & 772 & 0.02565 & 1221 & 0.24579 \\ 
+  6 & 745.2 &  & 849.4 &  & 932.8 &  & 1300 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 0.29542 & 667 & 0.11261 & 772 & 0.1908 & 1221 & 0.06462 \\ 
+  7 & 609 &  & 779.7 &  & 865.6 &  & 1357.25 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
+  1 & 503 & 0.01499 & 667 & 0.00143 & 772 & 0.0033 & 1221 & 0.03461 \\ 
+  8 & 766 &  & 885.5 &  & 1045 &  & 1405 &  \\ 
+   &  &  &  &  &  &  &  &  \\ 
    \bottomrule
 \end{tabular}
 \endgroup
-\caption{Taula d'anàlisi de quantiles} 
+\caption{Taula d'anàlisi de quantiles per a la variable guany de pes $BW41_{28}$} 
 \label{tab:tot}
 \end{table}
+
 
 
 \clearpage
@@ -281,14 +287,23 @@ Veiem un exemple de la sortida de RStudio i una taula resumint els resultats per
 
 Usarem la variable \texttt{Coste\_per PV} del fitxer \texttt{CalculoIndices.xlsx} modificat.\\
 
-La variable s'ha calculat de la següent forma:\\
+La variable s'ha calculat de la següent forma:
+$$
+\mbox{\text{Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pes [kg]}}
+$$
 
-Cost/kg PV (\EUR{}/kg) = (cost pinso [\EUR{}/kg] * consum pinso [kg]) / guany pes [kg]
 
+\vspace{0.5cm}
+\subsection{Exploració de la variable Cost}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-1} 
 
-
+\end{knitrout}
 
 Per tal de millorar la normalitat del costos apliquem una transformació de Tukey de la llibreria \texttt{rcompanion}:
+
+{\footnotesize
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
@@ -301,23 +316,24 @@ Per tal de millorar la normalitat del costos apliquem una transformació de Tuke
 ## if (lambda <  0){TRANS = -1 * x ^ lambda}
 \end{verbatim}
 \end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-19-1} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-19-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-21-1} 
 
 \end{knitrout}
+}
 
 El programa selecciona una lambda de $-5.4$ de manera que com $\lambda < 0$ la tranformació aplicada als costos serà $costTuk = -1 * Cost^{\lambda}$
+\vspace{0.5cm}
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-1} 
-
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-20-2} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-22-1} 
 
 \end{knitrout}
 
-Ajustem un model ANOVA i realitzem els següents tests:
+\subsection{Anàlisi dels resultats}
+Amb les dades normalitzades ajustem un model ANOVA i realitzem els següents tests:
+
+{\footnotesize
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
@@ -329,13 +345,13 @@ Ajustem un model ANOVA i realitzem els següents tests:
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-
+}
 
 \paragraph{Tukey multiple pairwise-comparisons:}
 
-Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments amb una probabilitat de cobertura especificada familiarment.
+Crea un conjunt d'intervals de confiança per les diferències de les mitjanes per als diferents tractaments.
 
-
+{\footnotesize
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
@@ -350,14 +366,36 @@ Crea un conjunt d'intervals de confiança per les diferències de les mitjanes p
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+}
+
+
+Si observem el p-valor ajustat per comparacions múltiples observem que els tractments més significatius respecte del control són els tractaments 4,3 i 5, en ordre de significació.
+
+\vspace{0.5cm}
 \clearpage
-\paragraph{Pairewise t-test:}
+\paragraph{Pairwise t-test:}
 
-Calcula comparacions per parelles entre els diferent tractaments amb correccions per a proves múltiples.
+Calcula comparacions per parelles entre els diferents tractaments, primer sense i després amb correccions per a proves múltiples. La primera taula conté el p-value usuals del t-test i la de sota conté el p-value ajustat pel mètode de Benjamin  \& Hockberg (BH), un p-valor que ens indica els False Discovery Rate (FDR). Se solen considerar significatives totes les diferències amb un  adj-p-values menor que 0.1.
 
+{\footnotesize
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
+## 
+## 	Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  costos$CostTuk and costos$Treat 
+## 
+##   1       2       3       4       5       6       7      
+## 2 0.43197 -       -       -       -       -       -      
+## 3 0.00408 0.03276 -       -       -       -       -      
+## 4 0.00065 0.00703 0.55183 -       -       -       -      
+## 5 0.00654 0.04813 0.86817 0.44713 -       -       -      
+## 6 0.81213 0.58286 0.00798 0.00139 0.01250 -       -      
+## 7 0.57274 0.17906 0.00072 9.6e-05 0.00122 0.42338 -      
+## 8 0.03932 0.19476 0.38818 0.14700 0.48518 0.06690 0.00948
+## 
+## P value adjustment method: none
 ## 
 ## 	Pairwise comparisons using t tests with pooled SD 
 ## 
@@ -376,9 +414,13 @@ Calcula comparacions per parelles entre els diferent tractaments amb correccions
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+}
 
+Observem les comparacions per parelles de tractaments sense cap tipus de correcció (p-valors més petits) i amb la correcció de Benjamin \& Hochberg que controla el rati de falsos positius a l'hora de fer múltiples comparacions.\\
 
+Cal destacar que les diferències en els p-valors per a les comparacions dos a dos es deuen a que el t.test i les comparacions de Tukey utilitzen metodologies diferents per a obtenir el p-valor.\\
 
+Els resultats de la correcció de Tukey i de BH no coincideixen perquè la correcció de Tukey és més conservadora. Ens inclinem per presentar aquesta segona opció: p-value sense ajustar i ajustat per BH.
 
 
 \clearpage
@@ -406,7 +448,8 @@ Calcula comparacions per parelles entre els diferent tractaments amb correccions
 \url{https://www.rdocumentation.org/packages/EnvStats/versions/2.4.0}
 
 \bibitem{quantileTest}
-\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}
+\url{https://www.rdocumentation.org/packages/EnvStats/versions/2.3.1/topics/quantileTest}\\
+\url{https://www.jstor.org/stable/2532001?seq=1&cid=pdf-reference}
 
 \bibitem{xtable}
 \url{https://www.rdocumentation.org/packages/xtable/versions/1.8-4}
@@ -425,6 +468,9 @@ Calcula comparacions per parelles entre els diferent tractaments amb correccions
 
 \bibitem{pairwise.t.test}
 \url{https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/pairwise.t.test}
+
+\bibitem{levene.test}
+\url{https://www.rdocumentation.org/packages/lawstat/versions/3.2/topics/levene.test}
 
 
 \end{thebibliography}
